@@ -1,0 +1,28 @@
+{
+    "name": "dragonrun1/event-mediator",
+    "description": "A general event mediator (dispatcher) with minimum dependencies so it is easy to drop in and use.",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Michael Cummings",
+            "email": "dragonaire@users.sourceforge.net",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "EventMediator\\": ["src/"]
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "ext-SPL": "*",
+        "php": ">=5.4.1"
+    },
+    "require-dev": {
+        "satooshi/php-coveralls": "dev-master"
+    }
+}

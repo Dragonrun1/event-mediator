@@ -1,0 +1,12 @@
+suites:
+    event_suite:
+        namespace: EventMediator
+        psr4_prefix: EventMediator
+        spec_path: tests
+        spec_prefix: specs
+        src_path: src
+
+extensions:
+    - PhpSpec\NyanFormattersExtension\Extension
+
+formatter.name: nyan.cat

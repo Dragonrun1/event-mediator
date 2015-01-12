@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>Event Mediator</title>
+    <logging>
+        <level>warn</level>
+        <paths>
+            <default>{APP_ROOT}/log/{DATE}.phpdoc.log</default>
+            <errors>{APP_ROOT}/log/{DATE}.phpdoc.errors.log</errors>
+        </paths>
+    </logging>
+    <parser>
+        <default-package-name>EventMediator</default-package-name>
+        <target>docs/phpdoc</target>
+    </parser>
+    <transformer>
+        <target>docs/phpdoc</target>
+        <template name="responsive-twig"/>
+    </transformer>
+    <files>
+        <directory>bin</directory>
+        <directory>src</directory>
+    </files>
+</phpdoc>
