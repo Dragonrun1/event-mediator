@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Bootstrap.
+ * Contains auto loader bootstrap.
  *
  * PHP version 5.4
  *
@@ -19,7 +19,7 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program; if not, you may write to the
+ * this program; if not, you may write to
  *
  * Free Software Foundation, Inc.
  * 59 Temple Place, Suite 330
@@ -28,9 +28,10 @@
  * or find a electronic copy at
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE file.
+ * You should also be able to find a copy of this license in the included
+ * LICENSE file.
  *
- * @copyright 2014-2015 Michael Cummings
+ * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -39,8 +40,8 @@
  * vendor/bin/
  * OR ./
  * OR bin/
- * OR src/MyProject/
- * OR vendor/MyProject/MyProject/
+ * OR src/Project/
+ * OR vendor/Project/Project/
  */
 (@include_once dirname(__DIR__) . '/autoload.php')
 || (@include_once __DIR__ . '/vendor/autoload.php')
