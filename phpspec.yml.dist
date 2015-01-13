@@ -2,11 +2,11 @@ suites:
     event_suite:
         namespace: EventMediator
         psr4_prefix: EventMediator
-        spec_path: tests
-        spec_prefix: specs
+        spec_path: specs
+        spec_prefix: Spec
         src_path: src
 
 extensions:
     - PhpSpec\NyanFormattersExtension\Extension
 
-formatter.name: nyan.cat
+formatter.name: nyan.dino
