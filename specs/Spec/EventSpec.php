@@ -61,6 +61,7 @@ class EventSpec extends
      */
     public function it_is_initializable()
     {
+        $this->shouldHaveType('EventMediator\Event');
         $this->shouldImplement('EventMediator\EventInterface');
     }
     /**

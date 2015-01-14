@@ -49,11 +49,15 @@ use Prophecy\Argument;
  * Class MediatorSpec
  *
  * @mixin Mediator
+ *
+ * @method $this shouldHaveCount()
+ * @method $this shouldHaveKey()
  * @method void shouldReturn()
  * @method void shouldReturnAnInstanceOf()
  * @method $this shouldThrow()
  * @method void duringAddListener()
  * @method void duringTrigger()
+ * @method $this getListeners()
  * @method $this trigger()
  */
 class MediatorSpec extends
@@ -71,9 +75,7 @@ class MediatorSpec extends
      */
     public function it_returns_fluent_interface_from_addListener()
     {
-        $callable = function () {
-        };
-        $this->addListener('test', $callable)
+        $this->addListener('test', [$this, 'test_dummy1'])
              ->shouldReturn($this);
     }
     /**
@@ -87,7 +89,75 @@ class MediatorSpec extends
          */
         $this->trigger('test', null)
              ->shouldReturnAnInstanceOf('EventMediator\EventInterface');
-        //$event->shouldImplement('EventMediator\EventInterface');
+    }
+    public function it_should_ignore_duplicate_listeners_for_the_same_event_and_priority_in_AddListeners(
+    )
+    {
+        $this->addListener('event', [$this, 'test_dummy1']);
+        $this->addListener('event', [$this, 'test_dummy1']);
+        $this->getListeners('event')
+             ->shouldHaveCount(1);
+    }
+    public function it_should_return_all_listeners_if_event_name_empty_in_getListeners(
+    )
+    {
+        $listeners = [
+            ['event1', $this, 'test_dummy1', 'first'],
+            ['event2', $this, 'test_dummy1', 0],
+            ['event2', $this, 'test_dummy1', 'first']
+        ];
+        foreach ($listeners as $listener) {
+            list($event, $object, $method, $priority) = $listener;
+            $this->addListener($event, [$object, $method], $priority);
+        }
+        $this->getListeners()
+             ->shouldHaveCount(2);
+        $this->getListeners()
+             ->shouldHaveKey('event1');
+        $this->getListeners()
+             ->shouldHaveKey('event2');
+    }
+    /**
+     *
+     */
+    public function it_should_return_empty_array_from_getListeners_when_has_no_listeners_for_that_event_name(
+    )
+    {
+        $this->addListener('test2', [$this, 'test_dummy1'])
+             ->getListeners('test1')
+             ->shouldHaveCount(0);
+    }
+    /**
+     *
+     */
+    public function it_should_return_empty_array_from_getListeners_when_has_no_listeners_set(
+    )
+    {
+        $this->getListeners()
+             ->shouldHaveCount(0);
+    }
+    public function it_should_return_only_listeners_for_requested_event_name_from_getListeners(
+    )
+    {
+        $listeners = [
+            ['event1', $this, 'test_dummy1', 'first'],
+            ['event2', $this, 'test_dummy1', 0],
+            ['event2', $this, 'test_dummy1', 'last']
+        ];
+        foreach ($listeners as $listener) {
+            list($event, $object, $method, $priority) = $listener;
+            $this->addListener($event, [$object, $method], $priority);
+        }
+        $this->getListeners('event1')
+             ->shouldHaveCount(1);
+        $this->getListeners('event1')
+             ->shouldHaveKey(1);
+        $this->getListeners('event2')
+             ->shouldHaveCount(2);
+        $this->getListeners('event2')
+             ->shouldHaveKey(0);
+        $this->getListeners('event2')
+             ->shouldHaveKey(-1);
     }
     /**
      *
@@ -156,5 +226,13 @@ class MediatorSpec extends
             $this->shouldThrow(new InvalidArgumentException($mess))
                  ->duringTrigger($eventName);
         }
+    }
+    public function test_dummy1()
+    {
+        // Just needed for testing.
+    }
+    public function test_dummy2()
+    {
+        // Just needed for testing.
     }
 }

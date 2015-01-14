@@ -46,18 +46,59 @@ use InvalidArgumentException;
 class Mediator
 {
     /**
-     * @param string     $eventName
-     * @param callable   $listener
-     * @param int|string $priority
+     * @param string         $eventName
+     * @param array|callable $listener
+     * @param int|string     $priority
      *
      * @return $this
      * @throws DomainException
      * @throws InvalidArgumentException
      */
-    public function addListener($eventName, callable $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0)
     {
         $this->checkEventName($eventName);
+        $this->checkAllowedListener($listener);
+        if ($priority === 'first') {
+            $priority =
+                !empty($this->listeners[$eventName]) ?
+                    max(array_keys($this->listeners[$eventName])) + 1 : 1;
+        } elseif ($priority === 'last') {
+            $priority =
+                !empty($this->listeners[$eventName]) ?
+                    min(array_keys($this->listeners[$eventName])) - 1 : -1;
+        }
+        if (!empty($this->listeners[$eventName][$priority])) {
+            $key = array_search(
+                $listener,
+                $this->listeners[$eventName][$priority],
+                true
+            );
+            if (false !== $key) {
+                return $this;
+            }
+        }
+        $this->listeners[$eventName][$priority][] = $listener;
         return $this;
+    }
+    /**
+     * @param string $eventName
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function getListeners($eventName = '')
+    {
+        if (!is_string($eventName)) {
+            $mess =
+                'Event name MUST be a string, but given ' . gettype($eventName);
+            throw new InvalidArgumentException($mess);
+        }
+        $this->sortListeners($eventName);
+        if ('' !== $eventName) {
+            return (!empty($this->listeners[$eventName]))
+                ? $this->listeners[$eventName] : [];
+        }
+        return $this->listeners;
     }
     /**
      * @param string         $eventName
@@ -74,6 +115,38 @@ class Mediator
             $event = new Event();
         }
         return $event;
+    }
+    /**
+     * @param $listener
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function checkAllowedListener(&$listener)
+    {
+        if (is_array($listener) && 2 === count($listener)) {
+            list($object, $method) = $listener;
+            if (!is_string($method)) {
+                $mess =
+                    'Listener method name MUST be a string, but given '
+                    . gettype($method);
+                throw new InvalidArgumentException($mess);
+            }
+            if (is_object($object)) {
+                return;
+            }
+            if (is_callable($object)) {
+                $listener[0] = $object;
+                return;
+            }
+            if (is_string($object)) {
+                $listener[0] = new $object;
+                return;
+            }
+        }
+        $mess =
+            'Listener MUST be [object, "methodName"], '
+            . '["className", "methodName"], or ' . '[callable, "methodName"]';
+        throw new InvalidArgumentException($mess);
     }
     /**
      * @param $eventName
@@ -93,4 +166,33 @@ class Mediator
             throw new DomainException($mess);
         }
     }
+    /**
+     * @param string $eventName
+     *
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    protected function sortListeners($eventName = '')
+    {
+        if (0 === count($this->listeners)) {
+            return $this;
+        }
+        if ('' !== $eventName) {
+            $eventNames = [$eventName];
+        } else {
+            ksort($this->listeners);
+            $eventNames = array_keys($this->listeners);
+        }
+        foreach ($eventNames as $eventName) {
+            if (empty($this->listeners[$eventName])) {
+                continue;
+            }
+            ksort($this->listeners[$eventName], SORT_NUMERIC);
+        }
+        return $this;
+    }
+    /**
+     * @type array $listeners
+     */
+    protected $listeners = [];
 }
