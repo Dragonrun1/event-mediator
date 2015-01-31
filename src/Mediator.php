@@ -43,14 +43,11 @@ use InvalidArgumentException;
 /**
  * Class Mediator
  */
-class Mediator
+class Mediator implements MediatorInterface
 {
     /**
-     * @param string         $eventName
-     * @param array|callable $listener
-     * @param int|string     $priority
+     * @inheritdoc
      *
-     * @return $this
      * @throws DomainException
      * @throws InvalidArgumentException
      */
@@ -79,9 +76,7 @@ class Mediator
         return $this;
     }
     /**
-     * @param SubscriberInterface $sub
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function addSubscriber(SubscriberInterface $sub)
     {
@@ -112,9 +107,8 @@ class Mediator
         return $this;
     }
     /**
-     * @param string $eventName
+     * @inheritdoc
      *
-     * @return array
      * @throws InvalidArgumentException
      */
     public function getListeners($eventName = '')
@@ -133,9 +127,8 @@ class Mediator
         return $this->listeners;
     }
     /**
-     * @param string $eventName
+     * @inheritdoc
      *
-     * @return bool
      * @throws InvalidArgumentException
      */
     public function hasListeners($eventName = '')
@@ -143,10 +136,8 @@ class Mediator
         return (bool)$this->getListeners($eventName);
     }
     /**
-     * @param $eventName
-     * @param $listener
+     * @inheritdoc
      *
-     * @return $this
      * @throws DomainException
      * @throws InvalidArgumentException
      */
@@ -172,9 +163,7 @@ class Mediator
         return $this;
     }
     /**
-     * @param SubscriberInterface $sub
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function removeSubscriber(SubscriberInterface $sub)
     {
@@ -205,10 +194,8 @@ class Mediator
         return $this;
     }
     /**
-     * @param string         $eventName
-     * @param EventInterface $event
+     * @inheritdoc
      *
-     * @return EventInterface
      * @throws DomainException
      * @throws InvalidArgumentException
      */
