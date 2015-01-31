@@ -6,7 +6,7 @@
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
- * with minimum dependencies so it is easy to drop in and use.
+ * which has minimal dependencies so it is easy to drop in and use.
  * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -78,13 +78,13 @@ class EventSpec extends
     public function itShouldHaveHandledEventAfterEventHandledUsed()
     {
         $this->eventHandled()
-             ->shouldHaveHandled();
+             ->shouldHaveBeenHandled();
     }
     /**
      *
      */
     public function itShouldHaveNotHandledEventInitially()
     {
-        $this->shouldNotHaveHandled();
+        $this->shouldNotHaveBeenHandled();
     }
 }

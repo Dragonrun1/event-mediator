@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Event class.
+ * Contains MockListener class.
  *
  * PHP version 5.4
  *
@@ -35,30 +35,26 @@
  * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace EventMediator;
+namespace Spec\EventMediator;
+
+use EventMediator\Event;
+use EventMediator\MediatorInterface;
 
 /**
- * Class Event
+ * Class MockListener
  */
-class Event implements EventInterface
+class MockListener
 {
     /**
-     * @return $this
+     * @param Event             $event
+     * @param string            $eventName
+     * @param MediatorInterface $mediator
      */
-    public function eventHandled()
-    {
-        $this->handled = true;
-        return $this;
+    public function method1(
+        Event $event,
+        $eventName,
+        MediatorInterface $mediator
+    ) {
+        // Dummy test method
     }
-    /**
-     * @return bool
-     */
-    public function hasBeenHandled()
-    {
-        return $this->handled;
-    }
-    /**
-     * @type bool
-     */
-    protected $handled = false;
 }

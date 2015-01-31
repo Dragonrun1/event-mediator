@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Event class.
+ * Contains Event trait.
  *
  * PHP version 5.4
  *
@@ -38,9 +38,9 @@
 namespace EventMediator;
 
 /**
- * Class Event
+ * Trait EventTrait
  */
-class Event implements EventInterface
+trait EventTrait
 {
     /**
      * @return $this

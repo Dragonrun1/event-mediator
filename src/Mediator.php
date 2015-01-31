@@ -6,7 +6,7 @@
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
- * with minimum dependencies so it is easy to drop in and use.
+ * which has minimal dependencies so it is easy to drop in and use.
  * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -205,11 +205,21 @@ class Mediator implements MediatorInterface
         if (null === $event) {
             $event = new Event();
         }
+        $listeners = $this->getListeners($eventName);
+        if (0 !== count($listeners)) {
+            foreach ($listeners as $listener) {
+                call_user_func($listener, $event, $eventName, $this);
+                if ($event->hasBeenHandled()) {
+                    break;
+                }
+            }
+        }
         return $event;
     }
     /**
      * @param $listener
      *
+     * @throws DomainException
      * @throws InvalidArgumentException
      */
     protected function checkAllowedListener(&$listener)
@@ -221,15 +231,37 @@ class Mediator implements MediatorInterface
                         . gettype($method);
                 throw new InvalidArgumentException($mess);
             }
+            if (is_string($object)) {
+                if ('' === $object) {
+                    $mess = 'Listener class name can NOT be empty';
+                    throw new DomainException($mess);
+                }
+                if (!class_exists($object)) {
+                    $mess = sprintf('Listener class %s could NOT be found', $object);
+                    throw new DomainException($mess);
+                }
+                if (!in_array($method, get_class_methods($object), true)) {
+                    $mess = sprintf(
+                        'Listener class %1$s does NOT contain method %2$s',
+                        $object,
+                        $method
+                    );
+                    throw new InvalidArgumentException($mess);
+                }
+                return;
+            }
             if (is_object($object)) {
+                if (!in_array($method, get_class_methods($object), true)) {
+                    $mess = sprintf(
+                        'Class %1$s does NOT contain method %2$s',
+                        get_class($object),
+                        $method
+                    );
+                    throw new InvalidArgumentException($mess);
+                }
                 return;
             }
             if (is_callable($object)) {
-                $listener[0] = $object;
-                return;
-            }
-            if (is_string($object)) {
-                $listener[0] = new $object;
                 return;
             }
         }
