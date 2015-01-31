@@ -59,13 +59,11 @@ class Mediator
         $this->checkEventName($eventName);
         $this->checkAllowedListener($listener);
         if ($priority === 'first') {
-            $priority =
-                !empty($this->listeners[$eventName]) ?
-                    max(array_keys($this->listeners[$eventName])) + 1 : 1;
+            $priority = !empty($this->listeners[$eventName]) ?
+                max(array_keys($this->listeners[$eventName])) + 1 : 1;
         } elseif ($priority === 'last') {
-            $priority =
-                !empty($this->listeners[$eventName]) ?
-                    min(array_keys($this->listeners[$eventName])) - 1 : -1;
+            $priority = !empty($this->listeners[$eventName]) ?
+                min(array_keys($this->listeners[$eventName])) - 1 : -1;
         }
         if (!empty($this->listeners[$eventName][$priority])) {
             $key = array_search(
@@ -81,6 +79,39 @@ class Mediator
         return $this;
     }
     /**
+     * @param SubscriberInterface $sub
+     *
+     * @return $this
+     */
+    public function addSubscriber(SubscriberInterface $sub)
+    {
+        /**
+         * @type string|array $listeners
+         */
+        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
+            if (is_string($listeners)) {
+                $this->addListener($eventName, [$sub, $listeners]);
+                continue;
+            }
+            if (is_string($listeners[0])) {
+                $this->addListener(
+                    $eventName,
+                    [$sub, $listeners[0]],
+                    array_key_exists(1, $listeners) ? $listeners[1] : 0
+                );
+            } elseif (is_array($listeners)) {
+                foreach ($listeners as $listener) {
+                    $this->addListener(
+                        $eventName,
+                        [$sub, $listener[0]],
+                        array_key_exists(1, $listener) ? $listener[1] : 0
+                    );
+                }
+            }
+        }
+        return $this;
+    }
+    /**
      * @param string $eventName
      *
      * @return array
@@ -89,7 +120,8 @@ class Mediator
     public function getListeners($eventName = '')
     {
         if (!is_string($eventName)) {
-            $mess =
+            $mess
+                =
                 'Event name MUST be a string, but given ' . gettype($eventName);
             throw new InvalidArgumentException($mess);
         }
@@ -99,6 +131,78 @@ class Mediator
                 ? $this->listeners[$eventName] : [];
         }
         return $this->listeners;
+    }
+    /**
+     * @param string $eventName
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function hasListeners($eventName = '')
+    {
+        return (bool)$this->getListeners($eventName);
+    }
+    /**
+     * @param $eventName
+     * @param $listener
+     *
+     * @return $this
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     */
+    public function removeListener($eventName, $listener)
+    {
+        $this->checkEventName($eventName);
+        if (!array_key_exists($eventName, $this->listeners)) {
+            return $this;
+        }
+        $this->checkAllowedListener($listener);
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            $key = array_search($listener, $listeners, true);
+            if (false !== $key) {
+                unset($this->listeners[$eventName][$priority][$key]);
+                if (0 === count($this->listeners[$eventName][$priority])) {
+                    unset($this->listeners[$eventName][$priority]);
+                }
+                if (0 === count($this->listeners[$eventName])) {
+                    unset($this->listeners[$eventName]);
+                }
+            }
+        }
+        return $this;
+    }
+    /**
+     * @param SubscriberInterface $sub
+     *
+     * @return $this
+     */
+    public function removeSubscriber(SubscriberInterface $sub)
+    {
+        /**
+         * @type string|array $listeners
+         */
+        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
+            if (is_string($listeners)) {
+                $this->removeListener($eventName, [$sub, $listeners]);
+                continue;
+            }
+            if (is_string($listeners[0])) {
+                $this->removeListener(
+                    $eventName,
+                    [$sub, $listeners[0]],
+                    array_key_exists(1, $listeners) ? $listeners[1] : 0
+                );
+            } elseif (is_array($listeners)) {
+                foreach ($listeners as $listener) {
+                    $this->removeListener(
+                        $eventName,
+                        [$sub, $listener[0]],
+                        array_key_exists(1, $listener) ? $listener[1] : 0
+                    );
+                }
+            }
+        }
+        return $this;
     }
     /**
      * @param string         $eventName
@@ -126,9 +230,8 @@ class Mediator
         if (is_array($listener) && 2 === count($listener)) {
             list($object, $method) = $listener;
             if (!is_string($method)) {
-                $mess =
-                    'Listener method name MUST be a string, but given '
-                    . gettype($method);
+                $mess = 'Listener method name MUST be a string, but given '
+                        . gettype($method);
                 throw new InvalidArgumentException($mess);
             }
             if (is_object($object)) {
@@ -143,9 +246,9 @@ class Mediator
                 return;
             }
         }
-        $mess =
-            'Listener MUST be [object, "methodName"], '
-            . '["className", "methodName"], or ' . '[callable, "methodName"]';
+        $mess = 'Listener MUST be [object, "methodName"], '
+                . '["className", "methodName"], or '
+                . '[callable, "methodName"]';
         throw new InvalidArgumentException($mess);
     }
     /**
@@ -157,7 +260,8 @@ class Mediator
     protected function checkEventName($eventName)
     {
         if (!is_string($eventName)) {
-            $mess =
+            $mess
+                =
                 'Event name MUST be a string, but given ' . gettype($eventName);
             throw new InvalidArgumentException($mess);
         }

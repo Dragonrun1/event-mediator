@@ -54,12 +54,12 @@ use Prophecy\Argument;
  * @method $this shouldThrow()
  */
 class EventSpec extends
-    ObjectBehavior
+ ObjectBehavior
 {
     /**
      *
      */
-    public function it_is_initializable()
+    public function itIsInitializable()
     {
         $this->shouldHaveType('EventMediator\Event');
         $this->shouldImplement('EventMediator\EventInterface');
@@ -67,7 +67,7 @@ class EventSpec extends
     /**
      *
      */
-    public function it_returns_fluent_interface_from_eventHandled()
+    public function itProvidesFluentInterfaceFromEventHandled()
     {
         $this->eventHandled()
              ->shouldReturn($this);
@@ -75,7 +75,7 @@ class EventSpec extends
     /**
      *
      */
-    public function it_should_have_handled_event_after_eventHandled()
+    public function itShouldHaveHandledEventAfterEventHandledUsed()
     {
         $this->eventHandled()
              ->shouldHaveHandled();
@@ -83,7 +83,7 @@ class EventSpec extends
     /**
      *
      */
-    public function it_should_have_not_handled_event_initially()
+    public function itShouldHaveNotHandledEventInitially()
     {
         $this->shouldNotHaveHandled();
     }
