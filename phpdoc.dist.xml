@@ -17,7 +17,6 @@
         <template name="responsive-twig"/>
     </transformer>
     <files>
-        <directory>bin</directory>
         <directory>src</directory>
     </files>
 </phpdoc>

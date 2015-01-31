@@ -1,6 +1,6 @@
 {
     "name": "dragonrun1/event-mediator",
-    "description": "A general event mediator (dispatcher) with minimum dependencies so it is easy to drop in and use.",
+    "description": "A general event mediator (dispatcher) which has minimal dependencies so it is easy to drop in and use.",
     "license": "GPL-2.0",
     "authors": [
         {
@@ -10,20 +10,26 @@
         }
     ],
     "autoload": {
-        "psr-0": {"Spec\\EventMediator\\": ["specs/"]},
         "psr-4": {
-            "EventMediator\\": ["src/"]
+            "EventMediator\\": ["src/"],
+            "Spec\\": ["specs/"]
         }
     },
     "config": {
         "optimize-autoloader": true
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "ext-SPL": "*",
         "php": ">=5.4.1"
     },
     "require-dev": {
-        "satooshi/php-coveralls": "dev-master"
+        "dragonrun1/phpspec": "dev-master",
+        "fabpot/php-cs-fixer": "dev-master",
+        "phpspec/nyan-formatters":  "1.0.1",
+        "phpspec/prophecy": "1.3.1",
+        "satooshi/php-coveralls": "dev-master",
+        "symfony/console": "<2.7"
     }
 }
