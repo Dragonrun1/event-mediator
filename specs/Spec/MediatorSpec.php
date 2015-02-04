@@ -39,7 +39,6 @@ namespace Spec\EventMediator;
 
 use DomainException;
 use EventMediator\Event;
-use EventMediator\MediatorInterface;
 use InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -158,7 +157,7 @@ class MediatorSpec extends ObjectBehavior
         $event
     ) {
         /**
-         * @type MediatorSpec|MediatorInterface                                     $this
+         * @type \EventMediator\MediatorInterface $this
          * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
          */
         $this->addListener('test1', [$listener, 'method1']);
@@ -257,7 +256,7 @@ class MediatorSpec extends ObjectBehavior
         $event
     ) {
         /**
-         * @type MediatorSpec|MediatorInterface                                     $this
+         * @type \EventMediator\MediatorInterface $this
          * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener1
          * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener2
          */
