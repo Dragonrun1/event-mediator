@@ -10,9 +10,9 @@
         }
     ],
     "autoload": {
+        "psr-0": {"Spec\\": "specs/"},
         "psr-4": {
-            "EventMediator\\": ["src/"],
-            "Spec\\": ["specs/"]
+            "EventMediator\\": ["src/"]
         }
     },
     "config": {
@@ -22,7 +22,8 @@
     "prefer-stable": true,
     "require": {
         "ext-SPL": "*",
-        "php": ">=5.4.1"
+        "php": ">=5.4.1",
+        "pimple/pimple": "~3.0"
     },
     "require-dev": {
         "dragonrun1/phpspec": "dev-master",
