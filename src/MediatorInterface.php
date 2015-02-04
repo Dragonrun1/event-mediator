@@ -43,13 +43,13 @@ namespace EventMediator;
 interface MediatorInterface
 {
     /**
-     * @param string         $eventName
-     * @param array|callable $listener
-     * @param int|string     $priority
+     * @param string     $eventName
+     * @param array      $listener
+     * @param int|string $priority
      *
      * @return $this Fluent interface
      */
-    public function addListener($eventName, $listener, $priority = 0);
+    public function addListener($eventName, array $listener, $priority = 0);
     /**
      * @param SubscriberInterface $sub
      *
@@ -69,12 +69,12 @@ interface MediatorInterface
      */
     public function hasListeners($eventName = '');
     /**
-     * @param $eventName
-     * @param $listener
+     * @param string $eventName
+     * @param array  $listener
      *
      * @return $this Fluent interface
      */
-    public function removeListener($eventName, $listener);
+    public function removeListener($eventName, array $listener);
     /**
      * @param SubscriberInterface $sub
      *

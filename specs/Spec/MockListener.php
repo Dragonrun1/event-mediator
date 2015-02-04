@@ -49,6 +49,8 @@ class MockListener
      * @param Event             $event
      * @param string            $eventName
      * @param MediatorInterface $mediator
+     *
+     * @return $this
      */
     public function method1(
         Event $event,
@@ -56,5 +58,6 @@ class MockListener
         MediatorInterface $mediator
     ) {
         // Dummy test method
+        return $this;
     }
 }
