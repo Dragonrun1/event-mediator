@@ -53,8 +53,7 @@ use Prophecy\Argument;
  * @method void shouldReturnAnInstanceOf()
  * @method $this shouldThrow()
  */
-class EventSpec extends
- ObjectBehavior
+class EventSpec extends ObjectBehavior
 {
     /**
      *
