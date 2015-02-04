@@ -38,17 +38,15 @@
 namespace Spec\EventMediator;
 
 use DomainException;
-use EventMediator\ContainerMediatorInterface;
-use EventMediator\PimpleContainerMediator;
 use InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 /**
  * Class PimpleContainerMediatorSpec
  *
- * @mixin PimpleContainerMediator
+ * @mixin \EventMediator\PimpleContainerMediator
  *
+ * @method void shouldImplement()
  * @method void shouldHaveListeners()
  * @method void shouldNotHaveListeners()
  * @method void shouldReturn()
@@ -63,7 +61,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
 {
     public function itIsInitializable()
     {
-        $this->shouldHaveType('EventMediator\PimpleContainerMediator');
+        $this->shouldHaveType('\\EventMediator\\PimpleContainerMediator');
+        $this->shouldImplement('\\EventMediator\\ContainerMediatorInterface');
     }
     public function itProvidesFluentInterfaceFromAddServiceListener()
     {
@@ -123,7 +122,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $container
     ) {
         /**
-         * @type PimpleContainerMediatorSpec|ContainerMediatorInterface             $this
+         * @type PimpleContainerMediatorSpec|\EventMediator\ContainerMediatorInterface $this
          * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
          */
         $this->addServiceListener('test1', ['TestService', 'method1']);
@@ -151,7 +150,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $sub
     ) {
         /**
-         * @type PimpleContainerMediatorSpec|ContainerMediatorInterface             $this
+         * @type PimpleContainerMediatorSpec|\EventMediator\ContainerMediatorInterface $this
          * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
          */
         $sub->getSubscribedEvents()

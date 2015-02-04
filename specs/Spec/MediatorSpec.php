@@ -39,7 +39,6 @@ namespace Spec\EventMediator;
 
 use DomainException;
 use EventMediator\Event;
-use EventMediator\Mediator;
 use EventMediator\MediatorInterface;
 use InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
@@ -48,8 +47,9 @@ use Prophecy\Argument;
 /**
  * Class MediatorSpec
  *
- * @mixin Mediator
+ * @mixin \EventMediator\Mediator
  *
+ * @method void shouldImplement()
  * @method void shouldHaveListeners()
  * @method void shouldNotHaveListeners()
  * @method void shouldReturn()
@@ -63,7 +63,8 @@ class MediatorSpec extends ObjectBehavior
 {
     public function itIsInitializable()
     {
-        $this->shouldHaveType('EventMediator\Mediator');
+        $this->shouldHaveType('\\EventMediator\\Mediator');
+        $this->shouldImplement('\\EventMediator\\MediatorInterface');
     }
     public function itProvidesFluentInterfaceFromAddListener()
     {

@@ -37,18 +37,16 @@
  */
 namespace Spec\EventMediator;
 
-use EventMediator\Event;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 /**
  * Class EventSpec
  *
- * @mixin Event
+ * @mixin \EventMediator\Event
  *
  * @method void shouldImplement()
- * @method void shouldNotHaveHandled()
- * @method void shouldHaveHandled()
+ * @method void shouldHaveBeenHandled()
+ * @method void shouldNotHaveBeenHandled()
  * @method void shouldReturn()
  * @method void shouldReturnAnInstanceOf()
  * @method $this shouldThrow()
@@ -60,8 +58,8 @@ class EventSpec extends ObjectBehavior
      */
     public function itIsInitializable()
     {
-        $this->shouldHaveType('EventMediator\Event');
-        $this->shouldImplement('EventMediator\EventInterface');
+        $this->shouldHaveType('\\EventMediator\\Event');
+        $this->shouldImplement('\\EventMediator\\EventInterface');
     }
     /**
      *
