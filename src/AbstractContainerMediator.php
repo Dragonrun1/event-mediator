@@ -41,7 +41,6 @@ namespace EventMediator;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use Pimple\Container;
 
 /**
  * Class AbstractContainerMediator
@@ -268,7 +267,7 @@ abstract class AbstractContainerMediator extends Mediator implements
      *
      * @param string $serviceName
      *
-     * @return callable
+     * @return array
      */
     abstract protected function getServiceByName($serviceName);
     /**
@@ -326,7 +325,7 @@ abstract class AbstractContainerMediator extends Mediator implements
     /**
      * Used to get the service container.
      *
-     * @return Container
+     * @return mixed
      * @throws LogicException
      */
     protected function getServiceContainer()

@@ -61,6 +61,8 @@ class PimpleContainerMediator extends AbstractContainerMediator
     /**
      * @inheritdoc
      *
+     * @param Container $value
+     *
      * @link http://pimple.sensiolabs.org/ Pimple
      */
     public function setServiceContainer($value = null)
@@ -79,9 +81,8 @@ class PimpleContainerMediator extends AbstractContainerMediator
         $this->serviceContainer = $value;
     }
     /**
-     * @param string $serviceName
+     * @inheritdoc
      *
-     * @return callable
      * @throws LogicException
      */
     protected function getServiceByName($serviceName)
