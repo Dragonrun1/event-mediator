@@ -161,9 +161,10 @@ abstract class AbstractContainerMediator extends Mediator implements
     public function getServiceListeners($eventName = '')
     {
         if (!is_string($eventName)) {
-            $mess
-                =
-                'Event name MUST be a string, but given ' . gettype($eventName);
+            $mess = sprintf(
+                'Event name MUST be a string, but given %s',
+                gettype($eventName)
+            );
             throw new InvalidArgumentException($mess);
         }
         $this->sortServiceListeners($eventName);
@@ -197,8 +198,8 @@ abstract class AbstractContainerMediator extends Mediator implements
                 unset($this->serviceListeners[$eventName][$priority][$key]);
                 // Remove empty priorities.
                 if (0 === count(
-                    $this->serviceListeners[$eventName][$priority]
-                )
+                        $this->serviceListeners[$eventName][$priority]
+                    )
                 ) {
                     unset($this->serviceListeners[$eventName][$priority]);
                 }
@@ -217,7 +218,10 @@ abstract class AbstractContainerMediator extends Mediator implements
         $serviceName,
         SubscriberInterface $sub
     ) {
-        return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
+        return $this->removeServiceSubscriberByEventList(
+            $serviceName,
+            $sub->getSubscribedEvents()
+        );
     }
     /**
      * @inheritdoc
@@ -306,10 +310,10 @@ abstract class AbstractContainerMediator extends Mediator implements
         if (is_array($listener) && 2 === count($listener)) {
             list($class, $method) = $listener;
             if (!is_string($method)) {
-                $mess
-                    =
-                    'Service listener method name MUST be a string, but given '
-                    . gettype($method);
+                $mess = sprintf(
+                    'Service listener method name MUST be a string, but given %s',
+                    gettype($method)
+                );
                 throw new InvalidArgumentException($mess);
             }
             if ('' === $method) {
@@ -355,10 +359,6 @@ abstract class AbstractContainerMediator extends Mediator implements
      */
     protected function getServiceContainer()
     {
-        if (null === $this->serviceContainer) {
-            $mess = 'Tried to access service container before it was set';
-            throw new LogicException($mess);
-        }
         return $this->serviceContainer;
     }
     /**

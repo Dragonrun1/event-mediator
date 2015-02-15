@@ -37,7 +37,7 @@
  */
 namespace Spec\EventMediator;
 
-use EventMediator\Event;
+use EventMediator\EventInterface;
 use EventMediator\MediatorInterface;
 
 /**
@@ -46,18 +46,33 @@ use EventMediator\MediatorInterface;
 class MockListener
 {
     /**
-     * @param Event             $event
+     * @param EventInterface    $event
      * @param string            $eventName
      * @param MediatorInterface $mediator
      *
-     * @return $this
+     * @return EventInterface
      */
     public function method1(
-        Event $event,
+        EventInterface $event,
         $eventName,
         MediatorInterface $mediator
     ) {
         // Dummy test method
-        return $this;
+        return $event;
+    }
+    /**
+     * @param EventInterface    $event
+     * @param string            $eventName
+     * @param MediatorInterface $mediator
+     *
+     * @return EventInterface
+     */
+    public function method2(
+        EventInterface $event,
+        $eventName,
+        MediatorInterface $mediator
+    ) {
+        $event->eventHandled();
+        return $event;
     }
 }

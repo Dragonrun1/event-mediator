@@ -71,11 +71,10 @@ class PimpleContainerMediator extends AbstractContainerMediator
             $value = new Container();
         }
         if (!$value instanceof Container) {
-            $mess
-                =
-                'Must be an instance of Pimple Container but given ' . gettype(
-                    $value
-                );
+            $mess = sprintf(
+                'Must be an instance of Pimple Container but given %s',
+                gettype($value)
+            );
             throw new InvalidArgumentException($mess);
         }
         $this->serviceContainer = $value;

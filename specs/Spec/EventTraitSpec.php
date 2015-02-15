@@ -55,7 +55,7 @@ class EventTraitSpec extends ObjectBehavior
 {
     public function let()
     {
-        $this->beAnInstanceOf('\\Spec\\EventMediator\\EventTraitMock');
+        $this->beAnInstanceOf('\\Spec\\EventMediator\\MockEventTrait');
     }
     /**
      *
