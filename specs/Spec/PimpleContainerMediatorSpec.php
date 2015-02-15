@@ -79,6 +79,15 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->addServiceSubscriber('\DummyClass', $sub)
              ->shouldReturn($this);
     }
+    public function itProvidesFluentInterfaceFromAddServiceSubscriberByEventList(
+    )
+    {
+        $this->addServiceSubscriberByEventList(
+            '\DummyClass',
+            ['test1' => ['method1']]
+        )
+             ->shouldReturn($this);
+    }
     public function itProvidesFluentInterfaceFromRemoveServiceListener()
     {
         $this->removeServiceListener('test', ['\DummyClass', 'method1'])
@@ -93,6 +102,15 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
             ->willReturn(['test1' => ['method1']]);
         $this->addServiceSubscriber('\DummyClass', $sub);
         $this->removeServiceSubscriber('\DummyClass', $sub)
+             ->shouldReturn($this);
+    }
+    public function itProvidesFluentInterfaceFromRemoveServiceSubscriberByEventList(
+    )
+    {
+        $this->removeServiceSubscriberByEventList(
+            '\DummyClass',
+            ['test1' => ['method1']]
+        )
              ->shouldReturn($this);
     }
     public function itReturnsEmptyArrayBeforeAnyServiceListenersAdded()
@@ -123,7 +141,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
     ) {
         /**
          * @type PimpleContainerMediatorSpec|\EventMediator\ContainerMediatorInterface $this
-         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
+         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy    $listener
          */
         $this->addServiceListener('test1', ['TestService', 'method1']);
         $this->getServiceListeners()
@@ -136,9 +154,9 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->trigger('test1', $event);
     }
     /**
-     * @param \Spec\EventMediator\MockListener $listener
-     * @param \EventMediator\Event             $event
-     * @param \Pimple\Container                $container
+     * @param \Spec\EventMediator\MockListener   $listener
+     * @param \EventMediator\Event               $event
+     * @param \Pimple\Container                  $container
      * @param \Spec\EventMediator\MockSubscriber $sub
      *
      * @throws InvalidArgumentException
@@ -151,7 +169,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
     ) {
         /**
          * @type PimpleContainerMediatorSpec|\EventMediator\ContainerMediatorInterface $this
-         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
+         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy    $listener
          */
         $sub->getSubscribedEvents()
             ->willReturn(['test1' => ['method1']]);
@@ -201,18 +219,19 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->getServiceListeners()
              ->shouldHaveCount(0);
         $sub->getSubscribedEvents()
-            ->willReturn(['test1' => ['method1']]);
+            ->willReturn(['test1' => [['method1'], ['method2']]]);
         $this->addServiceSubscriber('\DummyClass', $sub);
         $this->getServiceListeners()
              ->shouldHaveCount(1);
-        $this->getSErviceListeners()
+        $this->getServiceListeners()
              ->shouldHaveKey('test1');
     }
     /**
      * @param \Spec\EventMediator\MockSubscriber $sub
      */
-    public function itShouldHaveNoServiceListenersIfOnlyServiceSubscriberIsRemoved($sub)
-    {
+    public function itShouldHaveNoServiceListenersIfOnlyServiceSubscriberIsRemoved(
+        $sub
+    ) {
         $sub->getSubscribedEvents()
             ->willReturn(
                 ['test1' => ['method1', 1], 'test2' => ['method1', 'last']]
@@ -224,7 +243,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->getServiceListeners()
              ->shouldHaveCount(0);
     }
-    public function itShouldIgnoreDuplicateServiceListenersForTheSameEventAndPriority()
+    public function itShouldIgnoreDuplicateServiceListenersForTheSameEventAndPriority(
+    )
     {
         $this->addServiceListener(
             'event',
@@ -237,19 +257,22 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->getServiceListeners('event')
              ->shouldHaveCount(1);
     }
-    public function itThrowsExceptionForEmptyEventNameWhenAddingServiceListener()
+    public function itThrowsExceptionForEmptyEventNameWhenAddingServiceListener(
+    )
     {
         $mess = 'Event name can NOT be empty';
         $this->shouldThrow(new DomainException($mess))
              ->duringAddServiceListener('', ['\DummyClass', 'method1']);
     }
-    public function itThrowsExceptionForEmptyEventNameWhenRemovingServiceListener()
+    public function itThrowsExceptionForEmptyEventNameWhenRemovingServiceListener(
+    )
     {
         $mess = 'Event name can NOT be empty';
         $this->shouldThrow(new DomainException($mess))
              ->duringRemoveServiceListener('', ['\DummyClass', 'method1']);
     }
-    public function itThrowsExceptionForInvalidListenerTypesWhenTryingToAddServiceListener()
+    public function itThrowsExceptionForInvalidListenerTypesWhenTryingToAddServiceListener(
+    )
     {
         $listeners = [
             [123, 'method1'],
@@ -263,7 +286,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
                  ->duringAddServiceListener('test', [$class, $method]);
         }
     }
-    public function itThrowsExceptionForNonStringEventNameWhenTryingToAddServiceListener()
+    public function itThrowsExceptionForNonStringEventNameWhenTryingToAddServiceListener(
+    )
     {
         $messages = [
             'array'   => [],
@@ -279,7 +303,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
                  );
         }
     }
-    public function itThrowsExceptionForNonStringEventNameWhenTryingToRemoveServiceListener()
+    public function itThrowsExceptionForNonStringEventNameWhenTryingToRemoveServiceListener(
+    )
     {
         $messages = [
             'array'   => [],
@@ -295,7 +320,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
                  );
         }
     }
-    public function itThrowsExceptionForNonStringListenerMethodNameWhenTryingToAddServiceListener()
+    public function itThrowsExceptionForNonStringListenerMethodNameWhenTryingToAddServiceListener(
+    )
     {
         $messages = [
             'array'   => [],
@@ -312,7 +338,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
                  );
         }
     }
-    public function itThrowsExceptionForNonStringListenerMethodNameWhenTryingToRemoveServiceListener()
+    public function itThrowsExceptionForNonStringListenerMethodNameWhenTryingToRemoveServiceListener(
+    )
     {
         $this->addServiceListener('test', ['\DummyClass', 'method1']);
         $messages = [
