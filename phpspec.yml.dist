@@ -7,6 +7,15 @@ suites:
         src_path: src
 
 extensions:
+    - PhpSpec\Extension\CodeCoverageExtension
     - PhpSpec\NyanFormattersExtension\Extension
 
 formatter.name: nyan.dino
+
+code_coverage:
+  format:
+    #- html
+    - clover
+  output:
+    #html: coverage
+    clover: coverage.xml
