@@ -39,3 +39,4 @@ filter:
     excluded_paths:
         - 'tests/*'
         - 'specs/*'
+        - 'vendor/*'
