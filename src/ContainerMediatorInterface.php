@@ -39,6 +39,16 @@ interface ContainerMediatorInterface extends MediatorInterface
         SubscriberInterface $sub
     );
     /**
+     * @param string $serviceName
+     * @param array  $eventList
+     *
+     * @return $this
+     */
+    public function addServiceSubscriberByEventList(
+        $serviceName,
+        array $eventList
+    );
+    /**
      * @param string $eventName
      *
      * @return array
@@ -62,6 +72,16 @@ interface ContainerMediatorInterface extends MediatorInterface
     public function removeServiceSubscriber(
         $serviceName,
         SubscriberInterface $sub
+    );
+    /**
+     * @param string $serviceName
+     * @param array  $eventList
+     *
+     * @return $this
+     */
+    public function removeServiceSubscriberByEventList(
+        $serviceName,
+        array  $eventList
     );
     /**
      * This is used to bring in the service container that will be used.

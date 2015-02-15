@@ -50,7 +50,7 @@ use Pimple\Container;
 class PimpleContainerMediator extends AbstractContainerMediator
 {
     /**
-     * @param Container $serviceContainer
+     * @param Container|null $serviceContainer
      *
      * @throws InvalidArgumentException
      */
@@ -61,7 +61,7 @@ class PimpleContainerMediator extends AbstractContainerMediator
     /**
      * @inheritdoc
      *
-     * @param Container $value
+     * @param Container|null $value
      *
      * @link http://pimple.sensiolabs.org/ Pimple
      */

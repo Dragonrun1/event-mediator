@@ -86,10 +86,26 @@ abstract class AbstractContainerMediator extends Mediator implements
      */
     public function addServiceSubscriber($serviceName, SubscriberInterface $sub)
     {
+        return $this->addServiceSubscriberByEventList(
+            $serviceName,
+            $sub->getSubscribedEvents()
+        );
+    }
+    /**
+     * @inheritdoc
+     */
+    public function addServiceSubscriberByEventList(
+        $serviceName,
+        array $eventList
+    ) {
+        if (0 === count($eventList)) {
+            return $this;
+        }
         /**
          * @type string|array $listeners
          */
-        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
+        foreach ($eventList as $eventName => $listeners) {
+            $this->checkEventName($eventName);
             if (is_string($listeners)) {
                 $this->addServiceListener(
                     $eventName,
@@ -201,10 +217,19 @@ abstract class AbstractContainerMediator extends Mediator implements
         $serviceName,
         SubscriberInterface $sub
     ) {
+        return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
+    }
+    /**
+     * @inheritdoc
+     */
+    public function removeServiceSubscriberByEventList(
+        $serviceName,
+        array  $eventList
+    ) {
         /**
          * @type string|array $listeners
          */
-        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
+        foreach ($eventList as $eventName => $listeners) {
             if (is_string($listeners)) {
                 $this->removeServiceListener(
                     $eventName,

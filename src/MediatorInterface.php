@@ -82,8 +82,8 @@ interface MediatorInterface
      */
     public function removeSubscriber(SubscriberInterface $sub);
     /**
-     * @param string         $eventName
-     * @param EventInterface $event
+     * @param string              $eventName
+     * @param EventInterface|null $event
      *
      * @return EventInterface
      */

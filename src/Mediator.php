@@ -57,7 +57,8 @@ class Mediator implements MediatorInterface
         $this->checkAllowedListener($listener);
         $priority = $this->getActualPriority($eventName, $priority);
         if (array_key_exists($eventName, $this->listeners)
-            && array_key_exists($priority, $this->listeners[$eventName])) {
+            && array_key_exists($priority, $this->listeners[$eventName])
+        ) {
             $key = array_search(
                 $listener,
                 $this->listeners[$eventName][$priority],
@@ -109,8 +110,9 @@ class Mediator implements MediatorInterface
     public function getListeners($eventName = '')
     {
         if (!is_string($eventName)) {
-            $mess = 'Event name MUST be a string, but given '
-                    . gettype($eventName);
+            $mess
+                =
+                'Event name MUST be a string, but given ' . gettype($eventName);
             throw new InvalidArgumentException($mess);
         }
         $this->sortListeners($eventName);
@@ -240,7 +242,10 @@ class Mediator implements MediatorInterface
                     throw new DomainException($mess);
                 }
                 if (!class_exists($object)) {
-                    $mess = sprintf('Listener class %s could NOT be found', $object);
+                    $mess = sprintf(
+                        'Listener class %s could NOT be found',
+                        $object
+                    );
                     throw new DomainException($mess);
                 }
                 if (!in_array($method, get_class_methods($object), true)) {
@@ -293,8 +298,8 @@ class Mediator implements MediatorInterface
         }
     }
     /**
-     * @param string $eventName
-     * @param mixed  $priority
+     * @param string     $eventName
+     * @param string|int $priority
      *
      * @return int
      */
