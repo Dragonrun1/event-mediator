@@ -76,6 +76,13 @@ class MockSubscriber implements SubscriberInterface
         // Mock event handler
     }
     /**
+     * @param EventInterface $event
+     */
+    public function method2(EventInterface $event)
+    {
+        // Mock event handler
+    }
+    /**
      * @param array $value
      */
     public function setSubscribedEvents(array $value)
