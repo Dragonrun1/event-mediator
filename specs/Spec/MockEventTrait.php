@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EventTraitMock class.
+ * Contains MockEventTrait class.
  *
  * PHP version 5.4
  *
@@ -13,9 +13,9 @@ use EventMediator\EventInterface;
 use EventMediator\EventTrait;
 
 /**
- * Class EventTraitMock
+ * Class MockEventTrait
  */
-class EventTraitMock implements EventInterface
+class MockEventTrait implements EventInterface
 {
     use EventTrait;
 }
