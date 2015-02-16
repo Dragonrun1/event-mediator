@@ -2,7 +2,8 @@ language: php
 before_script:
     - composer selfupdate
 install:
-    - composer install --prefer-source --no-interaction -o
+    - composer install --prefer-source --no-interaction --optimize-autoloader
+    - composer --dev --prefer-source --no-interaction require satooshi/php-coveralls:@dev
 matrix:
     allow_failures:
         - php: hhvm
@@ -13,8 +14,7 @@ matrix:
         - 5.4
         - hhvm
 script:
-    - mkdir -p logs
-    - vendor/bin/phpspec -n --format=dot --bootstrap=bootstrap.php run
-
+    - mkdir -p build
+    - vendor/bin/phpspec --bootstrap=bootstrap.php --no-interaction --stop-on-failure run
 after_script:
     - php vendor/bin/coveralls -v

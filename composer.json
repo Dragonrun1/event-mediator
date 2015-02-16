@@ -27,11 +27,7 @@
     },
     "require-dev": {
         "dragonrun1/phpspec": "dev-master",
-        "fabpot/php-cs-fixer": "dev-master",
         "henrikbjorn/phpspec-code-coverage": "1.0.1",
-        "pdepend/pdepend": "@stable",
-        "phpspec/nyan-formatters":  "1.0.1",
-        "satooshi/php-coveralls": "dev-master",
         "symfony/console": "<2.7"
     }
 }
