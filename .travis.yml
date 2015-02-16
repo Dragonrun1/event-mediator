@@ -2,8 +2,9 @@ language: php
 before_script:
     - composer selfupdate
 install:
-    - composer install --prefer-source --no-interaction --optimize-autoloader
+    - composer install --prefer-source --no-interaction
     - composer --dev --prefer-source --no-interaction require satooshi/php-coveralls:@dev
+    - composer dumpautoload
 matrix:
     allow_failures:
         - php: hhvm
