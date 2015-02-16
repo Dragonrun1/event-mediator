@@ -119,7 +119,9 @@ abstract class AbstractContainerMediator extends Mediator implements
                     [$serviceName, $listeners[0]],
                     array_key_exists(1, $listeners) ? $listeners[1] : 0
                 );
-            } elseif (is_array($listeners)) {
+                continue;
+            }
+            if (is_array($listeners)) {
                 foreach ($listeners as $listener) {
                     $this->addServiceListener(
                         $eventName,
