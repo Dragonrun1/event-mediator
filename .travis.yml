@@ -11,8 +11,8 @@ php:
   - hhvm
 
 script:
-    - mkdir -p build/logs
-    - vendor/bin/phpspec -n -v -f build/logs/clover.xml -b bin/bootstrap.php run
+    - mkdir -p logs
+    - vendor/bin/phpspec -n -v -b bin/bootstrap.php run
 
 after_script:
     - php vendor/bin/coveralls -v
