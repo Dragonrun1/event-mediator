@@ -14,8 +14,8 @@ formatter.name: nyan.dino
 
 code_coverage:
   format:
-    #- html
+    - html
     - clover
   output:
-    #html: coverage
+    html: coverage
     clover: coverage.xml
