@@ -1,7 +1,8 @@
 language: php
-install:
+before_script:
   - composer selfupdate
-  - composer install
+install:
+  - composer install --prefer-source --no-interaction --dev -o
 matrix:
 php:
   - 5.6
@@ -10,7 +11,7 @@ php:
   - hhvm
 
 script:
-    - phpunit --coverage-clover log/clover.xml
+    - vendor/bin/phpspec -n -v -f log/clover.xml -b bin/bootstrap.php run
 
 after_script:
     - php vendor/bin/coveralls -v
