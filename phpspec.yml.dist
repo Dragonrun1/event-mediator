@@ -18,4 +18,4 @@ code_coverage:
     - clover
   output:
     #html: coverage
-    clover: coverage.xml
+    clover: logs/clover.xml

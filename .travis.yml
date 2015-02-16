@@ -12,7 +12,7 @@ php:
 
 script:
     - mkdir -p logs
-    - vendor/bin/phpspec -n -v -b bin/bootstrap.php run
+    - vendor/bin/phpspec -n -v --bootstrap=bootstrap.php run
 
 after_script:
     - php vendor/bin/coveralls -v
