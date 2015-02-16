@@ -2,7 +2,7 @@ language: php
 before_script:
   - composer selfupdate
 install:
-  - composer install --prefer-source --no-interaction --dev -o
+  - composer install --prefer-source --no-interaction -o
 matrix:
 php:
   - 5.6
