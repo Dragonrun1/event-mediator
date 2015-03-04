@@ -53,10 +53,6 @@ use PhpSpec\ObjectBehavior;
  */
 class EventTraitSpec extends ObjectBehavior
 {
-    public function let()
-    {
-        $this->beAnInstanceOf('\\Spec\\EventMediator\\MockEventTrait');
-    }
     /**
      *
      */
@@ -79,5 +75,9 @@ class EventTraitSpec extends ObjectBehavior
     public function itShouldHaveNotHandledEventInitially()
     {
         $this->shouldNotHaveBeenHandled();
+    }
+    public function let()
+    {
+        $this->beAnInstanceOf('\\Spec\\EventMediator\\MockEventTrait');
     }
 }

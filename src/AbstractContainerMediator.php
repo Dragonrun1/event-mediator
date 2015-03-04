@@ -45,8 +45,7 @@ use LogicException;
 /**
  * Class AbstractContainerMediator
  */
-abstract class AbstractContainerMediator extends Mediator implements
-    ContainerMediatorInterface
+abstract class AbstractContainerMediator extends Mediator implements ContainerMediatorInterface
 {
     /**
      * @inheritdoc
@@ -150,8 +149,7 @@ abstract class AbstractContainerMediator extends Mediator implements
         $this->lazyLoadServices($eventName)
              ->sortListeners($eventName);
         if ('' !== $eventName) {
-            return array_key_exists($eventName, $this->listeners)
-                ? $this->listeners[$eventName] : [];
+            return array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
         }
         return $this->listeners;
     }
@@ -171,8 +169,7 @@ abstract class AbstractContainerMediator extends Mediator implements
         }
         $this->sortServiceListeners($eventName);
         if ('' !== $eventName) {
-            return (!empty($this->serviceListeners[$eventName]))
-                ? $this->serviceListeners[$eventName] : [];
+            return (!empty($this->serviceListeners[$eventName])) ? $this->serviceListeners[$eventName] : [];
         }
         return $this->serviceListeners;
     }
@@ -237,25 +234,14 @@ abstract class AbstractContainerMediator extends Mediator implements
          */
         foreach ($eventList as $eventName => $listeners) {
             if (is_string($listeners)) {
-                $this->removeServiceListener(
-                    $eventName,
-                    [$serviceName, $listeners]
-                );
+                $this->removeServiceListener($eventName, [$serviceName, $listeners]);
                 continue;
             }
             if (is_string($listeners[0])) {
-                $this->removeServiceListener(
-                    $eventName,
-                    [$serviceName, $listeners[0]],
-                    array_key_exists(1, $listeners) ? $listeners[1] : 0
-                );
+                $this->removeServiceListener($eventName, [$serviceName, $listeners[0]]);
             } elseif (is_array($listeners)) {
                 foreach ($listeners as $listener) {
-                    $this->removeServiceListener(
-                        $eventName,
-                        [$serviceName, $listener[0]],
-                        array_key_exists(1, $listener) ? $listener[1] : 0
-                    );
+                    $this->removeServiceListener($eventName, [$serviceName, $listener[0]]);
                 }
             }
         }

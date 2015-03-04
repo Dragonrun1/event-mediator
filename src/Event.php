@@ -43,7 +43,9 @@ namespace EventMediator;
 class Event implements EventInterface
 {
     /**
-     * @return $this
+     * Listener uses this to let mediator know the event has been handled.
+     *
+     * @return $this Fluent interface.
      */
     public function eventHandled()
     {
@@ -51,13 +53,16 @@ class Event implements EventInterface
         return $this;
     }
     /**
-     * @return bool
+     * Used to check if event has already been handled.
+     *
+     * @return bool Returns true if listener claims to have handled event.
      */
     public function hasBeenHandled()
     {
         return $this->handled;
     }
     /**
+     * Used to hold handled status.
      * @type bool
      */
     protected $handled = false;

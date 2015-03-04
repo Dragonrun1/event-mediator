@@ -170,18 +170,10 @@ class Mediator implements MediatorInterface
                 continue;
             }
             if (is_string($listeners[0])) {
-                $this->removeListener(
-                    $eventName,
-                    [$sub, $listeners[0]],
-                    array_key_exists(1, $listeners) ? $listeners[1] : 0
-                );
+                $this->removeListener($eventName, [$sub, $listeners[0]]);
             } elseif (is_array($listeners)) {
                 foreach ($listeners as $listener) {
-                    $this->removeListener(
-                        $eventName,
-                        [$sub, $listener[0]],
-                        array_key_exists(1, $listener) ? $listener[1] : 0
-                    );
+                    $this->removeListener($eventName, [$sub, $listener[0]]);
                 }
             }
         }

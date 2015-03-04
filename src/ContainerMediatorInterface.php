@@ -17,11 +17,11 @@ interface ContainerMediatorInterface extends MediatorInterface
     /**
      * Add a service as an event listener.
      *
-     * @param string     $eventName
-     * @param array      $listener
-     * @param int|string $priority
+     * @param string     $eventName Name of the event the listener is being added for.
+     * @param array      $listener  Listener to be added.
+     * @param int|string $priority  Priority level for the added listener.
      *
-     * @return $this
+     * @return $this Fluent interface.
      */
     public function addServiceListener(
         $eventName,
@@ -29,55 +29,71 @@ interface ContainerMediatorInterface extends MediatorInterface
         $priority = 0
     );
     /**
-     * @param string              $serviceName
-     * @param SubscriberInterface $sub
+     * Add a service as a subscriber to event(s).
      *
-     * @return $this
+     * @param string              $serviceName Name of the event the subscriber is being added for.
+     * @param SubscriberInterface $sub         Subscriber to be added.
+     *
+     * @return $this Fluent interface.
      */
     public function addServiceSubscriber(
         $serviceName,
         SubscriberInterface $sub
     );
     /**
-     * @param string $serviceName
-     * @param array  $eventList
+     * Adds service as an subscriber to event(s) using a list of like found in SubscriberInterface.
      *
-     * @return $this
+     * @param string $serviceName Name of the event the subscriber is being added for.
+     * @param array  $eventList   List of events the subscriber wishes to be added for. This uses the same format as
+     *                            SubscriberInterface.
+     *
+     * @return $this Fluent interface.
      */
     public function addServiceSubscriberByEventList(
         $serviceName,
         array $eventList
     );
     /**
-     * @param string $eventName
+     * Get a list of service listeners for an event.
      *
-     * @return array
+     * Note that if event name is empty all listeners will be returned. Any event subscribers are also included in the
+     * list.
+     *
+     * @param string $eventName Name of the event the list of service listeners is needed for.
+     *
+     * @return array List of event service listeners or empty array if event is unknown or has no listeners or
+     *               subscribers.
      */
     public function getServiceListeners($eventName = '');
     /**
-     * Add a service as an event listener.
+     * Remove a service as an event listener.
      *
-     * @param string $eventName
-     * @param array  $listener
+     * @param string $eventName Event name that listener is being removed from.
+     * @param array  $listener  Service listener to be removed.
      *
-     * @return $this
+     * @return $this Fluent interface.
      */
     public function removeServiceListener($eventName, array $listener);
     /**
-     * @param string              $serviceName
-     * @param SubscriberInterface $sub
+     * Remove a service subscriber from event(s).
      *
-     * @return $this
+     * @param string              $serviceName Event name that subscriber is being removed from.
+     * @param SubscriberInterface $sub         Subscriber to be removed.
+     *
+     * @return $this Fluent interface.
      */
     public function removeServiceSubscriber(
         $serviceName,
         SubscriberInterface $sub
     );
     /**
-     * @param string $serviceName
-     * @param array  $eventList
+     * Removes service as an subscriber to event(s) using a list of like found in SubscriberInterface.
      *
-     * @return $this
+     * @param string $serviceName Event name that subscriber is being removed from.
+     * @param array  $eventList   List of events the subscriber wishes to be removed from. This uses the same format as
+     *                            SubscriberInterface.
+     *
+     * @return $this Fluent interface.
      */
     public function removeServiceSubscriberByEventList(
         $serviceName,
@@ -94,9 +110,9 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @see PimpleContainerMediator Container mediator implemented using Pimple.
      *
-     * @param mixed $value
+     * @param mixed $value The service container to be used.
      *
-     * @return $this
+     * @return $this Fluent interface.
      */
     public function setServiceContainer($value = null);
 }
