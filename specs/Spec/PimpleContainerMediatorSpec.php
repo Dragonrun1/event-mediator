@@ -47,10 +47,10 @@ use Prophecy\Argument;
  *
  * @mixin \EventMediator\PimpleContainerMediator
  *
- * @method void shouldImplement()
+ * @method void shouldImplement($interface)
  * @method void shouldHaveListeners()
  * @method void shouldNotHaveListeners()
- * @method void shouldReturn()
+ * @method void shouldReturn($result)
  * @method void duringAddServiceListener()
  * @method void duringGetServiceListeners($value)
  * @method void duringRemoveServiceListener()
@@ -58,6 +58,7 @@ use Prophecy\Argument;
  * @method $this getListeners()
  * @method $this getServiceListeners()
  * @method $this trigger($value)
+ * @method void willReturn($result)
  */
 class PimpleContainerMediatorSpec extends ObjectBehavior
 {

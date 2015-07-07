@@ -48,15 +48,16 @@ use Prophecy\Argument;
  *
  * @mixin \EventMediator\Mediator
  *
- * @method void shouldImplement()
+ * @method void shouldImplement($interface)
  * @method void shouldHaveListeners()
  * @method void shouldNotHaveListeners()
- * @method void shouldReturn()
+ * @method void shouldReturn($result)
  * @method void duringAddListener()
  * @method void duringRemoveListener()
  * @method void duringTrigger()
  * @method $this getListeners()
  * @method $this trigger()
+ * @method void willReturn($result)
  */
 class MediatorSpec extends ObjectBehavior
 {

@@ -44,12 +44,13 @@ use PhpSpec\ObjectBehavior;
  *
  * @mixin \EventMediator\Event
  *
- * @method void shouldImplement()
+ * @method void shouldImplement($interface)
  * @method void shouldHaveBeenHandled()
  * @method void shouldNotHaveBeenHandled()
- * @method void shouldReturn()
+ * @method void shouldReturn($result)
  * @method void shouldReturnAnInstanceOf()
  * @method $this shouldThrow()
+ * @method void willReturn($result)
  */
 class EventSpec extends ObjectBehavior
 {
