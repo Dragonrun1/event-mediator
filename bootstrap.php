@@ -56,8 +56,7 @@ error_reporting($errorReporting);
 unset($errorReporting);
 if (!class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
     if ('cli' === PHP_SAPI) {
-        $mess
-            = 'Could NOT find required Composer class auto loader. Aborting ...';
+        $mess = 'Could NOT find required Composer class auto loader. Aborting ...';
         fwrite(STDERR, $mess);
     }
     return 1;
