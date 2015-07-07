@@ -54,8 +54,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @inheritdoc
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function addServiceListener(
         $eventName,
@@ -68,11 +68,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         if (array_key_exists($eventName, $this->serviceListeners)
             && array_key_exists($priority, $this->serviceListeners[$eventName])
         ) {
-            $key = array_search(
-                $listener,
-                $this->serviceListeners[$eventName][$priority],
-                true
-            );
+            $key = array_search($listener, $this->serviceListeners[$eventName][$priority], true);
             if (false !== $key) {
                 return $this;
             }
@@ -85,13 +81,13 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      */
     public function addServiceSubscriber($serviceName, SubscriberInterface $sub)
     {
-        return $this->addServiceSubscriberByEventList(
-            $serviceName,
-            $sub->getSubscribedEvents()
-        );
+        return $this->addServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
      * @inheritdoc
+     *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function addServiceSubscriberByEventList(
         $serviceName,
@@ -106,27 +102,18 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         foreach ($eventList as $eventName => $listeners) {
             $this->checkEventName($eventName);
             if (is_string($listeners)) {
-                $this->addServiceListener(
-                    $eventName,
-                    [$serviceName, $listeners]
-                );
+                $this->addServiceListener($eventName, [$serviceName, $listeners]);
                 continue;
             }
             if (is_string($listeners[0])) {
-                $this->addServiceListener(
-                    $eventName,
-                    [$serviceName, $listeners[0]],
-                    array_key_exists(1, $listeners) ? $listeners[1] : 0
-                );
+                $this->addServiceListener($eventName, [$serviceName, $listeners[0]],
+                    array_key_exists(1, $listeners) ? $listeners[1] : 0);
                 continue;
             }
             if (is_array($listeners)) {
                 foreach ($listeners as $listener) {
-                    $this->addServiceListener(
-                        $eventName,
-                        [$serviceName, $listener[0]],
-                        array_key_exists(1, $listener) ? $listener[1] : 0
-                    );
+                    $this->addServiceListener($eventName, [$serviceName, $listener[0]],
+                        array_key_exists(1, $listener) ? $listener[1] : 0);
                 }
             }
         }
@@ -135,15 +122,12 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @inheritdoc
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getListeners($eventName = '')
     {
         if (!is_string($eventName)) {
-            $mess = sprintf(
-                'Event name MUST be a string, but given %s',
-                gettype($eventName)
-            );
+            $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
             throw new InvalidArgumentException($mess);
         }
         $this->lazyLoadServices($eventName)
@@ -155,16 +139,12 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     }
     /**
      * @inheritdoc
-     *
      * @throws InvalidArgumentException
      */
     public function getServiceListeners($eventName = '')
     {
         if (!is_string($eventName)) {
-            $mess = sprintf(
-                'Event name MUST be a string, but given %s',
-                gettype($eventName)
-            );
+            $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
             throw new InvalidArgumentException($mess);
         }
         $this->sortServiceListeners($eventName);
@@ -176,8 +156,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @inheritdoc
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function removeServiceListener($eventName, array $listener)
     {
@@ -196,10 +176,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             if (false !== $key) {
                 unset($this->serviceListeners[$eventName][$priority][$key]);
                 // Remove empty priorities.
-                if (0 === count(
-                        $this->serviceListeners[$eventName][$priority]
-                    )
-                ) {
+                if (0 === count($this->serviceListeners[$eventName][$priority])) {
                     unset($this->serviceListeners[$eventName][$priority]);
                 }
                 // Remove empty events.
@@ -217,10 +194,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         $serviceName,
         SubscriberInterface $sub
     ) {
-        return $this->removeServiceSubscriberByEventList(
-            $serviceName,
-            $sub->getSubscribedEvents()
-        );
+        return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
      * @inheritdoc
@@ -250,8 +224,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @inheritdoc
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function trigger($eventName, EventInterface $event = null)
     {
@@ -298,10 +272,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         if (is_array($listener) && 2 === count($listener)) {
             list($class, $method) = $listener;
             if (!is_string($method)) {
-                $mess = sprintf(
-                    'Service listener method name MUST be a string, but given %s',
-                    gettype($method)
-                );
+                $mess = sprintf('Service listener method name MUST be a string, but given %s', gettype($method));
                 throw new InvalidArgumentException($mess);
             }
             if ('' === $method) {
@@ -325,16 +296,16 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     protected function getActualPriority($eventName, $priority)
     {
         if ($priority === 'first') {
-            $listenerM = array_key_exists($eventName, $this->listeners) ?
-                max(array_keys($this->listeners[$eventName])) + 1 : 1;
-            $serviceM = array_key_exists($eventName, $this->serviceListeners) ?
-                max(array_keys($this->serviceListeners[$eventName])) + 1 : 1;
+            $listenerM = array_key_exists($eventName, $this->listeners) ? max(array_keys($this->listeners[$eventName]))
+                                                                          + 1 : 1;
+            $serviceM = array_key_exists($eventName, $this->serviceListeners)
+                ? max(array_keys($this->serviceListeners[$eventName])) + 1 : 1;
             return ($listenerM > $serviceM) ? $listenerM : $serviceM;
         } elseif ($priority === 'last') {
-            $listenerM = array_key_exists($eventName, $this->listeners) ?
-                min(array_keys($this->listeners[$eventName])) - 1 : -1;
-            $serviceM = array_key_exists($eventName, $this->serviceListeners) ?
-                min(array_keys($this->serviceListeners[$eventName])) - 1 : -1;
+            $listenerM = array_key_exists($eventName, $this->listeners) ? min(array_keys($this->listeners[$eventName]))
+                                                                          - 1 : -1;
+            $serviceM = array_key_exists($eventName, $this->serviceListeners)
+                ? min(array_keys($this->serviceListeners[$eventName])) - 1 : -1;
             return ($listenerM < $serviceM) ? $listenerM : $serviceM;
         }
         return (int)$priority;
@@ -343,7 +314,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * Used to get the service container.
      *
      * @return mixed
-     * @throws LogicException
+     *
+     * @throws \LogicException
      */
     protected function getServiceContainer()
     {
@@ -375,11 +347,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
                 foreach ($listeners as $listener) {
                     list($class, $method) = $listener;
                     $class = $this->getServiceByName($class);
-                    $this->addListener(
-                        $eventName,
-                        [$class, $method],
-                        $priority
-                    );
+                    $this->addListener($eventName, [$class, $method], $priority);
                 }
             }
         }
