@@ -27,6 +27,7 @@
     },
     "require-dev": {
         "dragonrun1/phpspec": "dev-master",
+        "phpspec/nyan-formatters": "1.0.1",
         "henrikbjorn/phpspec-code-coverage": "1.0.1",
         "symfony/console": "<2.7"
     }
