@@ -39,11 +39,12 @@ namespace Spec\EventMediator;
 
 use EventMediator\EventInterface;
 use EventMediator\MediatorInterface;
+use Spec\MockListenerInterface;
 
 /**
  * Class MockListener
  */
-class MockListener
+class MockListener implements MockListenerInterface
 {
     /**
      * @param EventInterface    $event

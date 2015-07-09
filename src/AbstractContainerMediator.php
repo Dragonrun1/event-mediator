@@ -38,10 +38,6 @@
  */
 namespace EventMediator;
 
-use DomainException;
-use InvalidArgumentException;
-use LogicException;
-
 /**
  * Class AbstractContainerMediator
  */
@@ -128,7 +124,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     {
         if (!is_string($eventName)) {
             $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         $this->lazyLoadServices($eventName)
              ->sortListeners($eventName);
@@ -145,7 +141,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     {
         if (!is_string($eventName)) {
             $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         $this->sortServiceListeners($eventName);
         if ('' !== $eventName) {
@@ -273,22 +269,22 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             list($class, $method) = $listener;
             if (!is_string($method)) {
                 $mess = sprintf('Service listener method name MUST be a string, but given %s', gettype($method));
-                throw new InvalidArgumentException($mess);
+                throw new \InvalidArgumentException($mess);
             }
             if ('' === $method) {
                 $mess = 'Listener method can NOT be empty';
-                throw new DomainException($mess);
+                throw new \DomainException($mess);
             }
             if (is_string($class)) {
                 if ('' === $class) {
                     $mess = 'Service listener class name can NOT be empty';
-                    throw new DomainException($mess);
+                    throw new \DomainException($mess);
                 }
                 return;
             }
         }
         $mess = 'Service listener MUST be ["className", "methodName"]';
-        throw new InvalidArgumentException($mess);
+        throw new \InvalidArgumentException($mess);
     }
     /**
      * @inheritdoc
@@ -314,8 +310,6 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * Used to get the service container.
      *
      * @return mixed
-     *
-     * @throws \LogicException
      */
     protected function getServiceContainer()
     {
