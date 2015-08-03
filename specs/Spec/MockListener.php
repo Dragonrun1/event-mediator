@@ -73,7 +73,6 @@ class MockListener implements MockListenerInterface
         $eventName,
         MediatorInterface $mediator
     ) {
-        $event->eventHandled();
-        return $event;
+        return $event->eventHandled();
     }
 }
