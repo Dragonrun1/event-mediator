@@ -68,10 +68,7 @@ class MediatorSpec extends ObjectBehavior
     }
     public function itProvidesFluentInterfaceFromAddListener()
     {
-        $this->addListener(
-            'test',
-            ['\Spec\EventMediator\MockListener', 'method1']
-        )
+        $this->addListener('test', ['\Spec\EventMediator\MockListener', 'method1'])
              ->shouldReturn($this);
     }
     /**
@@ -86,10 +83,7 @@ class MediatorSpec extends ObjectBehavior
     }
     public function itProvidesFluentInterfaceFromRemoveListener()
     {
-        $this->removeListener(
-            'test',
-            ['\\Spec\\EventMediator\\MockListener', 'method1']
-        )
+        $this->removeListener('test', ['\\Spec\\EventMediator\\MockListener', 'method1'])
              ->shouldReturn($this);
     }
     /**
@@ -110,10 +104,7 @@ class MediatorSpec extends ObjectBehavior
     }
     public function itReturnsEmptyArrayWhenEventHasNoListeners()
     {
-        $this->addListener(
-            'test2',
-            ['\Spec\EventMediator\MockListener', 'method1']
-        )
+        $this->addListener('test2', ['\Spec\EventMediator\MockListener', 'method1'])
              ->getListeners('test1')
              ->shouldHaveCount(0);
     }
@@ -124,9 +115,7 @@ class MediatorSpec extends ObjectBehavior
         $sub
     ) {
         $sub->getSubscribedEvents()
-            ->willReturn(
-                ['test1' => ['method1', 1], 'test2' => ['method1', 'last']]
-            );
+            ->willReturn(['test1' => ['method1', 1], 'test2' => ['method1', 'last']]);
         $this->addSubscriber($sub);
         $this->getListeners()
              ->shouldHaveCount(2);
@@ -148,6 +137,36 @@ class MediatorSpec extends ObjectBehavior
             $this->addListener($event, [$object, $method], $priority);
         }
         $this->shouldHaveListeners();
+    }
+    /**
+     * @param \Spec\EventMediator\MockListener $listener
+     * @param \EventMediator\Event             $event
+     */
+    public function itShouldCallListenersForTheirEventsInCorrectPriorityOrderWhenEventIsTriggered(
+        $listener,
+        $event
+    ) {
+        /**
+         * @type \EventMediator\MediatorInterface                                   $this
+         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
+         */
+        $this->addListener('test1', [$listener, 'method1']);
+        $this->addListener('test1', [$listener, 'method2']);
+        $this->addListener('test1', [$listener, 'method1'], 'first');
+        $this->addListener('test1', [$listener, 'method1'], 'last');
+        $this->getListeners()
+             ->shouldHaveKey('test1');
+        $this->trigger('test1', $event);
+        $listener->method1($event, 'test1', $this)
+                 ->shouldHaveBeenCalled();
+        $listener->method2($event, 'test1', $this)
+                 ->shouldHaveBeenCalled();
+        $expected = [1  => [[$listener, 'method1']],
+                     0  => [[$listener, 'method1'], [$listener, 'method2']],
+                     -1 => [[$listener, 'method1']]
+        ];
+        $this->getListeners('test1')
+             ->shouldReturn($expected);
     }
     /**
      * @param \Spec\EventMediator\MockListener $listener
@@ -193,10 +212,7 @@ class MediatorSpec extends ObjectBehavior
              ->shouldHaveKey('event2');
         $this->getListeners('event1')
              ->shouldHaveCount(2);
-        $this->removeListener(
-            'event1',
-            ['\Spec\EventMediator\MockListener', 'method1']
-        );
+        $this->removeListener('event1', ['\Spec\EventMediator\MockListener', 'method1']);
         $this->getListeners('event1')
              ->shouldHaveCount(0);
         $this->getListeners()
@@ -238,14 +254,8 @@ class MediatorSpec extends ObjectBehavior
     }
     public function itShouldIgnoreDuplicateListenersForTheSameEventAndPriority()
     {
-        $this->addListener(
-            'event',
-            ['\Spec\EventMediator\MockListener', 'method1']
-        );
-        $this->addListener(
-            'event',
-            ['\Spec\EventMediator\MockListener', 'method1']
-        );
+        $this->addListener('event', ['\Spec\EventMediator\MockListener', 'method1']);
+        $this->addListener('event', ['\Spec\EventMediator\MockListener', 'method1']);
         $this->getListeners('event')
              ->shouldHaveCount(1);
     }
@@ -349,10 +359,7 @@ class MediatorSpec extends ObjectBehavior
     {
         $mess = 'Listener method can NOT be empty';
         $this->shouldThrow(new DomainException($mess))
-             ->duringAddListener(
-                 'test',
-                 ['\Spec\EventMediator\MockListener', '']
-             );
+             ->duringAddListener('test', ['\Spec\EventMediator\MockListener', '']);
     }
     public function itThrowsExceptionForInvalidListenerMethodTypesWhenTryingToAddListener()
     {
@@ -364,9 +371,7 @@ class MediatorSpec extends ObjectBehavior
         $mess = 'Listener method name MUST be a string, but given ';
         foreach ($listeners as $listener) {
             list($object, $method) = $listener;
-            $this->shouldThrow(
-                new InvalidArgumentException($mess . gettype($listener[1]))
-            )
+            $this->shouldThrow(new InvalidArgumentException($mess . gettype($listener[1])))
                  ->duringAddListener('test', [$object, $method]);
         }
     }
@@ -446,23 +451,14 @@ class MediatorSpec extends ObjectBehavior
         $mess
             = 'Listener class \Spec\EventMediator\MockListener1 could NOT be found';
         $this->shouldThrow(new DomainException($mess))
-             ->duringAddListener(
-                 'test',
-                 ['\Spec\EventMediator\MockListener1', 'method1']
-             );
+             ->duringAddListener('test', ['\Spec\EventMediator\MockListener1', 'method1']);
     }
     public function itThrowsExceptionIfFQNListenerMethodDoesNotExistWhenTryingToAddListener()
     {
-        $mess = sprintf(
-            'Listener class %1$s does NOT contain method %2$s',
-            '\Spec\EventMediator\MockListener',
-            'method3'
-        );
+        $mess = sprintf('Listener class %1$s does NOT contain method %2$s', '\Spec\EventMediator\MockListener',
+            'method3');
         $this->shouldThrow(new InvalidArgumentException($mess))
-             ->duringAddListener(
-                 'test',
-                 ['\Spec\EventMediator\MockListener', 'method3']
-             );
+             ->duringAddListener('test', ['\Spec\EventMediator\MockListener', 'method3']);
     }
     public function itThrowsExceptionIfFQNListenerNameIsEmptyWhenTryingToAddListener()
     {
@@ -473,11 +469,7 @@ class MediatorSpec extends ObjectBehavior
     public function itThrowsExceptionIfObjectListenerMethodDoesNotExistWhenTryingToAddListener()
     {
         $listener = new MockListener();
-        $mess = sprintf(
-            'Listener class %1$s does NOT contain method %2$s',
-            get_class($listener),
-            'method3'
-        );
+        $mess = sprintf('Listener class %1$s does NOT contain method %2$s', get_class($listener), 'method3');
         $this->shouldThrow(new InvalidArgumentException($mess))
              ->duringAddListener('test', [$listener, 'method3']);
     }

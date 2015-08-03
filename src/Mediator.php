@@ -116,7 +116,7 @@ class Mediator implements MediatorInterface
         }
         $this->sortListeners($eventName);
         if ('' !== $eventName) {
-            return (!empty($this->listeners[$eventName])) ? $this->listeners[$eventName] : [];
+            return array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
         }
         return $this->listeners;
     }
@@ -343,7 +343,7 @@ class Mediator implements MediatorInterface
             $eventNames = array_keys($this->listeners);
         }
         foreach ($eventNames as $eventName) {
-            ksort($this->listeners[$eventName], SORT_NUMERIC);
+            krsort($this->listeners[$eventName], SORT_NUMERIC);
         }
         return $this;
     }
