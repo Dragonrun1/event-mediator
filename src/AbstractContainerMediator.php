@@ -73,7 +73,14 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this;
     }
     /**
-     * @inheritdoc
+     * Add a service as a subscriber to event(s).
+     *
+     * @param string              $serviceName Name of the event the subscriber is being added for.
+     * @param SubscriberInterface $sub         Subscriber to be added.
+     *
+     * @return $this Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function addServiceSubscriber($serviceName, SubscriberInterface $sub)
     {
@@ -126,16 +133,12 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
             throw new \InvalidArgumentException($mess);
         }
-        $this->lazyLoadServices($eventName)
-             ->sortListeners($eventName);
-        if ('' !== $eventName) {
-            return array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
-        }
-        return $this->listeners;
+        $this->lazyLoadServices($eventName);
+        return parent::getListeners($eventName);
     }
     /**
      * @inheritdoc
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getServiceListeners($eventName = '')
     {
@@ -184,7 +187,14 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this;
     }
     /**
-     * @inheritdoc
+     * Remove a service subscriber from event(s).
+     *
+     * @param string              $serviceName Event name that subscriber is being removed from.
+     * @param SubscriberInterface $sub         Subscriber to be removed.
+     *
+     * @return $this Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function removeServiceSubscriber(
         $serviceName,
@@ -193,7 +203,15 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
-     * @inheritdoc
+     * Removes service as an subscriber to event(s) using a list of like found in SubscriberInterface.
+     *
+     * @param string $serviceName Event name that subscriber is being removed from.
+     * @param array  $eventList   List of events the subscriber wishes to be removed from. This uses the same format as
+     *                            SubscriberInterface.
+     *
+     * @return $this Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function removeServiceSubscriberByEventList(
         $serviceName,
@@ -218,34 +236,6 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this;
     }
     /**
-     * @inheritdoc
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function trigger($eventName, EventInterface $event = null)
-    {
-        $this->checkEventName($eventName);
-        if (null === $event) {
-            $event = new Event();
-        }
-        $priorities = $this->getListeners($eventName);
-        if (0 !== count($priorities)) {
-            /**
-             * @type array $listeners
-             */
-            foreach ($priorities as $listeners) {
-                foreach ($listeners as $listener) {
-                    call_user_func($listener, $event, $eventName, $this);
-                    if ($event->hasBeenHandled()) {
-                        break;
-                    }
-                }
-            }
-        }
-        return $event;
-    }
-    /**
      * This method is used any time the mediator need to get the actual instance
      * of the class for an event.
      *
@@ -260,8 +250,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @param $listener
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function checkAllowedServiceListener($listener)
     {
@@ -287,22 +277,25 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         throw new \InvalidArgumentException($mess);
     }
     /**
-     * @inheritdoc
+     * @param string $eventName
+     * @param string|int $priority
+     *
+     * @return int
      */
     protected function getActualPriority($eventName, $priority)
     {
+        if (is_int($priority)) {
+            return $priority;
+        }
+        $listenerM = parent::getActualPriority($eventName, $priority);
         if ($priority === 'first') {
-            $listenerM = array_key_exists($eventName, $this->listeners) ? max(array_keys($this->listeners[$eventName]))
-                                                                          + 1 : 1;
             $serviceM = array_key_exists($eventName, $this->serviceListeners)
                 ? max(array_keys($this->serviceListeners[$eventName])) + 1 : 1;
-            return ($listenerM > $serviceM) ? $listenerM : $serviceM;
+            $priority = ($listenerM > $serviceM) ? $listenerM : $serviceM;
         } elseif ($priority === 'last') {
-            $listenerM = array_key_exists($eventName, $this->listeners) ? min(array_keys($this->listeners[$eventName]))
-                                                                          - 1 : -1;
             $serviceM = array_key_exists($eventName, $this->serviceListeners)
                 ? min(array_keys($this->serviceListeners[$eventName])) - 1 : -1;
-            return ($listenerM < $serviceM) ? $listenerM : $serviceM;
+            $priority = ($listenerM < $serviceM) ? $listenerM : $serviceM;
         }
         return (int)$priority;
     }
@@ -367,12 +360,13 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             $eventNames = array_keys($this->listeners);
         }
         foreach ($eventNames as $eventName) {
-            ksort($this->serviceListeners[$eventName], SORT_NUMERIC);
+            krsort($this->serviceListeners[$eventName], SORT_NUMERIC);
         }
         return $this;
     }
     /**
-     * @type array $triggeredServices
+     * List of already loaded services.
+     * @type array $loadedServices
      */
     protected $loadedServices = [];
     /**
