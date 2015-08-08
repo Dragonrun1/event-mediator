@@ -198,9 +198,7 @@ class Mediator implements MediatorInterface
              */
             foreach ($priorities as $listeners) {
                 foreach ($listeners as $listener) {
-                    $listener[0]->{$listener[1]}($event, $eventName, $this);
-                    //call_user_func_array($listener, $args);
-                    //$event = call_user_func($listener, $event, $eventName, $this);
+                    call_user_func($listener, $event, $eventName, $this);
                     if ($event->hasBeenHandled()) {
                         return $event;
                     }
