@@ -139,6 +139,8 @@ class MediatorSpec extends ObjectBehavior
         $this->shouldHaveListeners();
     }
     /**
+     * Issue #1 - Mediator calls listeners in wrong order.
+     *
      * @param \Spec\EventMediator\MockListener $listener
      * @param \EventMediator\Event             $event
      */
@@ -161,9 +163,10 @@ class MediatorSpec extends ObjectBehavior
                  ->shouldHaveBeenCalled();
         $listener->method2($event, 'test1', $this)
                  ->shouldHaveBeenCalled();
-        $expected = [1  => [[$listener, 'method1']],
-                     0  => [[$listener, 'method1'], [$listener, 'method2']],
-                     -1 => [[$listener, 'method1']]
+        $expected = [
+            1  => [[$listener, 'method1']],
+            0  => [[$listener, 'method1'], [$listener, 'method2']],
+            -1 => [[$listener, 'method1']]
         ];
         $this->getListeners('test1')
              ->shouldReturn($expected);
@@ -287,6 +290,36 @@ class MediatorSpec extends ObjectBehavior
         $this->trigger('test2', $event);
         $listener1->method1(Argument::type('\EventMediator\EventInterface'), Argument::any(), Argument::any())
                   ->shouldNotHaveBeenCalled();
+    }
+    /**
+     * Issue #2 - Higher priority handles don't stop lower priority listeners from seeing event.
+     *
+     * @param \Spec\EventMediator\MockListener $listener
+     * @param \EventMediator\Event             $event
+     */
+    public function itShouldOnlyCallListenersForEventUntilOneOfThemHandlesTheEvent($listener, $event)
+    {
+        /**
+         * @type \EventMediator\MediatorInterface                                   $this
+         * @type \Spec\EventMediator\MockListener|\Prophecy\Prophecy\MethodProphecy $listener
+         */
+        $event->hasBeenHandled()
+              ->willReturn(true)
+              ->shouldBeCalled();
+        $listener->method2($event, 'test1', $this)
+                 ->willReturn($event);
+        $this->addListener('test1', [$listener, 'method2']);
+        $this->addListener('test1', [$listener, 'method1'], 'last');
+        $this->getListeners()
+             ->shouldHaveKey('test1');
+        $expected = [0 => [[$listener, 'method2']], -1 => [[$listener, 'method1']]];
+        $this->getListeners('test1')
+             ->shouldReturn($expected);
+        $this->trigger('test1', $event);
+        $listener->method2($event, 'test1', $this)
+                 ->shouldHaveBeenCalled();
+        $listener->method1($event, 'test1', $this)
+                 ->shouldNotHaveBeenCalled();
     }
     public function itShouldReturnAllListenersIfEventNameIsEmpty()
     {
