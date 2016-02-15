@@ -52,11 +52,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return $this Fluent interface.
      */
-    public function addServiceListener(
-        $eventName,
-        array $listener,
-        $priority = 0
-    );
+    public function addServiceListener($eventName, array $listener, $priority = 0);
     /**
      * Add a service as a subscriber to event(s).
      *
@@ -65,10 +61,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return $this Fluent interface.
      */
-    public function addServiceSubscriber(
-        $serviceName,
-        SubscriberInterface $sub
-    );
+    public function addServiceSubscriber($serviceName, SubscriberInterface $sub);
     /**
      * Adds service as an subscriber to event(s) using a list of like found in SubscriberInterface.
      *
@@ -78,10 +71,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return $this Fluent interface.
      */
-    public function addServiceSubscriberByEventList(
-        $serviceName,
-        array $eventList
-    );
+    public function addServiceSubscriberByEventList($serviceName, array $eventList);
     /**
      * Get a list of service listeners for an event.
      *
@@ -111,10 +101,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return $this Fluent interface.
      */
-    public function removeServiceSubscriber(
-        $serviceName,
-        SubscriberInterface $sub
-    );
+    public function removeServiceSubscriber($serviceName, SubscriberInterface $sub);
     /**
      * Removes service as an subscriber to event(s) using a list of like found in SubscriberInterface.
      *
@@ -124,10 +111,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return $this Fluent interface.
      */
-    public function removeServiceSubscriberByEventList(
-        $serviceName,
-        array  $eventList
-    );
+    public function removeServiceSubscriberByEventList($serviceName, array  $eventList);
     /**
      * This is used to bring in the service container that will be used.
      *

@@ -44,20 +44,34 @@ namespace EventMediator;
 abstract class AbstractContainerMediator extends Mediator implements ContainerMediatorInterface
 {
     /**
-     * @inheritdoc
+     * This is used to bring in the service container that will be used.
+     *
+     * Though not required it would be considered best practice for this method
+     * to create a new instance of the container when given null. Another good
+     * practice is to call this method from the class constructor to allow
+     * easier testing. For examples of both have a look at
+     * PimpleContainerMediator.
+     *
+     * @see PimpleContainerMediator Container mediator implemented using Pimple.
+     *
+     * @param mixed $value The service container to be used.
+     *
+     * @return $this Fluent interface.
      */
     abstract public function setServiceContainer($value = null);
     /**
-     * @inheritdoc
+     * Add a service as an event listener.
      *
+     * @param string     $eventName Name of the event the listener is being added for.
+     * @param array      $listener  Listener to be added.
+     * @param int|string $priority  Priority level for the added listener.
+     *
+     * @return $this Fluent interface.
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function addServiceListener(
-        $eventName,
-        array $listener,
-        $priority = 0
-    ) {
+    public function addServiceListener($eventName, array $listener, $priority = 0)
+    {
         $this->checkEventName($eventName);
         $this->checkAllowedServiceListener($listener);
         $priority = $this->getActualPriority($eventName, $priority);
@@ -87,15 +101,18 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this->addServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
-     * @inheritdoc
+     * Adds service as an subscriber to event(s) using a list of like found in SubscriberInterface.
      *
+     * @param string $serviceName Name of the event the subscriber is being added for.
+     * @param array  $eventList   List of events the subscriber wishes to be added for. This uses the same format as
+     *                            SubscriberInterface.
+     *
+     * @return $this Fluent interface.
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function addServiceSubscriberByEventList(
-        $serviceName,
-        array $eventList
-    ) {
+    public function addServiceSubscriberByEventList($serviceName, array $eventList)
+    {
         if (0 === count($eventList)) {
             return $this;
         }
@@ -123,8 +140,10 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string $eventName
      *
+     * @return array
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      */
     public function getListeners($eventName = '')
@@ -137,7 +156,15 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return parent::getListeners($eventName);
     }
     /**
-     * @inheritdoc
+     * Get a list of service listeners for an event.
+     *
+     * Note that if event name is empty all listeners will be returned. Any event subscribers are also included in the
+     * list.
+     *
+     * @param string $eventName Name of the event the list of service listeners is needed for.
+     *
+     * @return array List of event service listeners or empty array if event is unknown or has no listeners or
+     *               subscribers.
      * @throws \InvalidArgumentException
      */
     public function getServiceListeners($eventName = '')
@@ -153,8 +180,12 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this->serviceListeners;
     }
     /**
-     * @inheritdoc
+     * Remove a service as an event listener.
      *
+     * @param string $eventName Event name that listener is being removed from.
+     * @param array  $listener  Service listener to be removed.
+     *
+     * @return $this Fluent interface.
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
@@ -196,10 +227,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function removeServiceSubscriber(
-        $serviceName,
-        SubscriberInterface $sub
-    ) {
+    public function removeServiceSubscriber($serviceName, SubscriberInterface $sub)
+    {
         return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
@@ -213,10 +242,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function removeServiceSubscriberByEventList(
-        $serviceName,
-        array  $eventList
-    ) {
+    public function removeServiceSubscriberByEventList($serviceName, array  $eventList)
+    {
         /**
          * @type string|array $listeners
          */
@@ -277,7 +304,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         throw new \InvalidArgumentException($mess);
     }
     /**
-     * @param string $eventName
+     * @param string     $eventName
      * @param string|int $priority
      *
      * @return int
@@ -312,6 +339,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * @param string $eventName
      *
      * @return $this Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function lazyLoadServices($eventName = '')
     {

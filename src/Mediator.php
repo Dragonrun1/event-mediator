@@ -37,19 +37,19 @@
  */
 namespace EventMediator;
 
-use DomainException;
-use InvalidArgumentException;
-
 /**
  * Class Mediator
  */
 class Mediator implements MediatorInterface
 {
     /**
-     * @inheritdoc
+     * @param string     $eventName
+     * @param array      $listener
+     * @param int|string $priority
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @return $this Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function addListener($eventName, array $listener, $priority = 0)
     {
@@ -72,7 +72,11 @@ class Mediator implements MediatorInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param SubscriberInterface $sub
+     *
+     * @return $this Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function addSubscriber(SubscriberInterface $sub)
     {
@@ -103,16 +107,17 @@ class Mediator implements MediatorInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string $eventName
      *
-     * @throws InvalidArgumentException
+     * @return array
+     * @throws \InvalidArgumentException
      */
     public function getListeners($eventName = '')
     {
         if (!is_string($eventName)) {
             $mess
                 = 'Event name MUST be a string, but given ' . gettype($eventName);
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         $this->sortListeners($eventName);
         if ('' !== $eventName) {
@@ -121,19 +126,22 @@ class Mediator implements MediatorInterface
         return $this->listeners;
     }
     /**
-     * @inheritdoc
+     * @param string $eventName
      *
-     * @throws InvalidArgumentException
+     * @return bool
+     * @throws \InvalidArgumentException
      */
     public function hasListeners($eventName = '')
     {
         return (bool)$this->getListeners($eventName);
     }
     /**
-     * @inheritdoc
+     * @param string $eventName
+     * @param array  $listener
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @return $this Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function removeListener($eventName, array $listener)
     {
@@ -157,7 +165,11 @@ class Mediator implements MediatorInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param SubscriberInterface $sub
+     *
+     * @return $this Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function removeSubscriber(SubscriberInterface $sub)
     {
@@ -180,10 +192,12 @@ class Mediator implements MediatorInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string              $eventName
+     * @param EventInterface|null $event
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @return EventInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function trigger($eventName, EventInterface $event = null)
     {
@@ -199,6 +213,7 @@ class Mediator implements MediatorInterface
             foreach ($priorities as $listeners) {
                 foreach ($listeners as $listener) {
                     call_user_func($listener, $event, $eventName, $this);
+                    /** @noinspection DisconnectedForeachInstructionInspection */
                     if ($event->hasBeenHandled()) {
                         return $event;
                     }
@@ -210,8 +225,8 @@ class Mediator implements MediatorInterface
     /**
      * @param $listener
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function checkAllowedListener($listener)
     {
@@ -229,7 +244,7 @@ class Mediator implements MediatorInterface
                         get_class($object),
                         $method
                     );
-                    throw new InvalidArgumentException($mess);
+                    throw new \InvalidArgumentException($mess);
                 }
                 return;
             }
@@ -239,62 +254,62 @@ class Mediator implements MediatorInterface
         }
         $mess = 'Listener MUST be [object, "methodName"], ' . '["className", "methodName"], or '
                 . '[callable, "methodName"]';
-        throw new InvalidArgumentException($mess);
+        throw new \InvalidArgumentException($mess);
     }
     /**
      * @param $eventName
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function checkEventName($eventName)
     {
         if (!is_string($eventName)) {
             $mess
                 = 'Event name MUST be a string, but given ' . gettype($eventName);
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         if ('' === $eventName) {
             $mess = 'Event name can NOT be empty';
-            throw new DomainException($mess);
+            throw new \DomainException($mess);
         }
     }
     /**
      * @param string $method
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function checkListenerMethod($method)
     {
         if (!is_string($method)) {
             $mess = sprintf('Listener method name MUST be a string, but given %s', gettype($method));
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         if ('' === $method) {
             $mess = 'Listener method can NOT be empty';
-            throw new DomainException($mess);
+            throw new \DomainException($mess);
         }
     }
     /**
      * @param $object
      * @param $method
      *
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     protected function checkStringListenerObject($object, $method)
     {
         if ('' === $object) {
             $mess = 'Listener class name can NOT be empty';
-            throw new DomainException($mess);
+            throw new \DomainException($mess);
         }
         if (!class_exists($object)) {
             $mess = sprintf(
                 'Listener class %s could NOT be found',
                 $object
             );
-            throw new DomainException($mess);
+            throw new \DomainException($mess);
         }
         if (!in_array($method, get_class_methods($object), true)) {
             $mess = sprintf(
@@ -302,7 +317,7 @@ class Mediator implements MediatorInterface
                 $object,
                 $method
             );
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
     }
     /**
@@ -326,7 +341,7 @@ class Mediator implements MediatorInterface
      * @param string $eventName
      *
      * @return $this
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function sortListeners($eventName = '')
     {

@@ -38,8 +38,6 @@
  */
 namespace EventMediator;
 
-use InvalidArgumentException;
-use LogicException;
 use Pimple\Container;
 
 /**
@@ -52,16 +50,24 @@ class PimpleContainerMediator extends AbstractContainerMediator
     /**
      * @param Container|null $serviceContainer
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function __construct(Container $serviceContainer = null)
     {
         $this->setServiceContainer($serviceContainer);
     }
     /**
-     * @inheritdoc
+     * This is used to bring in the service container that will be used.
+     *
+     * Though not required it would be considered best practice for this method
+     * to create a new instance of the container when given null. Another good
+     * practice is to call this method from the class constructor to allow
+     * easier testing.
      *
      * @param Container|null $value
+     *
+     * @return $this Fluent interface.
+     * @throws \InvalidArgumentException
      *
      * @link http://pimple.sensiolabs.org/ Pimple
      */
@@ -75,14 +81,21 @@ class PimpleContainerMediator extends AbstractContainerMediator
                 'Must be an instance of Pimple Container but given %s',
                 gettype($value)
             );
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }
         $this->serviceContainer = $value;
     }
     /**
-     * @inheritdoc
+     * This method is used any time the mediator need to get the actual instance
+     * of the class for an event.
      *
-     * @throws LogicException
+     * Normal will only be called during actual trigger of an event since lazy
+     * loading is used.
+     *
+     * @param string $serviceName
+     *
+     * @return array
+     * @throws \LogicException
      */
     protected function getServiceByName($serviceName)
     {
