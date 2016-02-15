@@ -101,7 +101,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return $this->addServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
     }
     /**
-     * Adds service as an subscriber to event(s) using a list of like found in SubscriberInterface.
+     * Adds service as a subscriber to event(s) using a list like found in SubscriberInterface.
      *
      * @param string $serviceName Name of the event the subscriber is being added for.
      * @param array  $eventList   List of events the subscriber wishes to be added for. This uses the same format as
