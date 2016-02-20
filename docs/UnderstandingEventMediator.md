@@ -120,3 +120,11 @@ class Logger extends MLogger implements EventAwareLoggerInterface
     }
 }
 ```
+
+Here's a short example of how an event might be triggered:
+```php
+/**
+ * @type \Yapeal\Event\Mediator $yem
+ */
+$yem->triggerLogEvent('test.dummy', Logger::WARNING, 'Ouch, gravity sucks!');
+```
