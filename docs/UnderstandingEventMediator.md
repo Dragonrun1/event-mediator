@@ -53,78 +53,39 @@ only sometimes triggered.
 
 ## Events
 
-So if you look at the EventInterface you'll notice it only has a couple of methods (`eventHandled()`,
-`hasBeenHandled()`). You also have the option of extend from the Event class too. To give you a better idea what an
-useful event might look like I'll give an examples from one of my own open source projects
-[Yapeal-ng](https://github.com/Yapeal/yapeal-ng). The example is used for logging in Yapeal-ng and can be found in
-[EventLogInterface.php](https://github.com/Yapeal/yapeal-ng/blob/master/lib/Event/LogEventInterface.php):
-```php
-/**
- * Interface LogEventInterface
- */
-interface LogEventInterface extends EventInterface
-{
-    /**
-     * @return array
-     */
-    public function getContext();
-    /**
-     * @return mixed
-     */
-    public function getLevel();
-    /**
-     * @return string
-     */
-    public function getMessage();
-    /**
-     * @param array $value
-     *
-     * @return self Fluent interface.
-     */
-    public function setContext(array $value);
-    /**
-     * @param mixed $value
-     *
-     * @return self
-     */
-    public function setLevel($value);
-    /**
-     * @param string $value
-     *
-     * @return self Fluent interface.
-     */
-    public function setMessage($value);
-}
-```
-And here's the wrapper class for [Monolog](https://github.com/Seldaek/monolog) that is registered to handle the log
-events which is found in [Logger.php](https://github.com/Yapeal/yapeal-ng/blob/master/lib/Log/Logger.php):
-```php
-use Monolog\Logger as MLogger;
-use Yapeal\Event\LogEventInterface;
+So if you look at the
+[EventInterface](https://github.com/Dragonrun1/event-mediator/blob/master/src/EventInterface.php)
+you'll notice it only has a couple of methods (`eventHandled()`,
+`hasBeenHandled()`). You also have the option of extend from the
+[Event](https://github.com/Dragonrun1/event-mediator/blob/master/src/Event.php)
+class. Next to give you a better idea what an complete and working event system might look like I'll use an example from
+one of my other open source projects which uses this project.
+ 
+### Logging Example
 
-/**
- * Class Logger
- */
-class Logger extends MLogger implements EventAwareLoggerInterface
-{
-    /**
-     * @param LogEventInterface $event
-     */
-    public function logEvent(LogEventInterface $event)
-    {
-        $this->log(
-            $event->getLevel(),
-            $event->getMessage(),
-            $event->getContext()
-        );
-    }
-}
-```
+To start out I'm going to list the steps needed to make a working logging event system using code examples from my
+[Yapeal-ng](https://github.com/Yapeal/yapeal-ng) project which is a re-write of another long time project with many
+improvements including switching to events for logging and the main processing among others. I'll show how the logging
+event stuff is done as I believe it's more general and probably easier to understand so you might find you can adept it
+to your own projects with little or no changes.
 
-Here's a short example of how an event might be triggered:
-```php
-/**
- * @type \Yapeal\Event\Mediator $yem
- */
-$yem->triggerLogEvent('test.dummy', Logger::WARNING, 'Ouch, gravity sucks!');
-```
+  1 Get new instance of Mediator. The
+  [Yapeal-ng Mediator](https://github.com/Yapeal/yapeal-ng/blob/master/lib/Event/Mediator.php) extends from the
+  [PimpleContainerMediator](https://github.com/Dragonrun1/event-mediator/blob/master/src/PimpleContainerMediator.php)
+  class and is initialized in a common initialization class in the
+  [`wireEvent()`](https://github.com/Yapeal/yapeal-ng/blob/eef492830cb53c195d8887abdb63f5912eead2ca/lib/Configuration/Wiring.php#L449-L453)
+  method. If you haven't used [Pimple](http://pimple.sensiolabs.org/) before you might have a quick look at it's docs.
+  
+  2 Next get the event log class and register it with the event system. Yapeal-ng adds an
+  [event wrapper](https://github.com/Yapeal/yapeal-ng/blob/master/lib/Log/Logger.php)
+  around an initialized instance of [Monolog](https://github.com/Seldaek/monolog) but should work with any
+  [PSR-3](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md) compatible class.
+  You'll find the initialization and registering of the class for the log events in the
+  [`wireLog()`](https://github.com/Yapeal/yapeal-ng/blob/eef492830cb53c195d8887abdb63f5912eead2ca/lib/Configuration/Wiring.php#L456-L503)
+  method.
+  
+  3 Start sending log event as needed. For an example of this we'll look at
+  [Yapeal::autoMagic()](https://github.com/Yapeal/yapeal-ng/blob/eef492830cb53c195d8887abdb63f5912eead2ca/lib/Yapeal.php#L69-L131)
+  which kicks off the main processing loop. After a couple setup lines the method sends Yapeal-ng's first log message on
+  line 83.
+  
