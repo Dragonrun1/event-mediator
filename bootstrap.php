@@ -2,12 +2,12 @@
 /**
  * Contains auto loader bootstrap.
  *
- * PHP version 5.4
+ * PHP version 5.6
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
  * with minimum dependencies so it is easy to drop in and use.
- * Copyright (C) 2015 Michael Cummings
+ * Copyright (C) 2015-2016 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -31,33 +31,37 @@
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
- * @copyright 2015 Michael Cummings
+ * @copyright 2015-2016 Michael Cummings
  * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 /*
- * Turn off warning messages for the following includes.
+ * Nothing to do if Composer auto loader already exists.
+ */
+if (class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
+    return;
+}
+/*
+ * Find Composer auto loader after striping away any vendor path.
+ */
+$path = str_replace('\\', '/', __DIR__);
+$vendorPos = strpos($path, 'vendor/');
+if (false !== $vendorPos) {
+    $path = substr($path, 0, $vendorPos);
+}
+/*
+ * Turn off warning messages for the following include.
  */
 $errorReporting = error_reporting(E_ALL & ~E_WARNING);
-/*
- * Find auto loader from one of
- * vendor/bin/
- * OR ./
- * OR bin/
- * OR src/Project/
- * OR vendor/Project/Project/
- */
-(include_once dirname(__DIR__) . '/autoload.php')
-|| (include_once __DIR__ . '/vendor/autoload.php')
-|| (include_once dirname(__DIR__) . '/vendor/autoload.php')
-|| (include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
-|| (include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php');
+include_once $path . '/vendor/autoload.php';
 error_reporting($errorReporting);
-unset($errorReporting);
+unset($errorReporting, $path, $vendorPos);
 if (!class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
+    $mess = 'Could NOT find required Composer class auto loader. Aborting ...';
     if ('cli' === PHP_SAPI) {
-        $mess = 'Could NOT find required Composer class auto loader. Aborting ...';
         fwrite(STDERR, $mess);
+    } else {
+        fwrite(STDOUT, $mess);
     }
     return 1;
 }
