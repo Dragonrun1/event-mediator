@@ -2,7 +2,7 @@
 /**
  * Contains PhpSpec EventTraitSpec class.
  *
- * PHP version 5.4
+ * PHP version 5.6
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
@@ -47,7 +47,7 @@ use PhpSpec\ObjectBehavior;
  * @method void shouldImplement()
  * @method void shouldHaveBeenHandled()
  * @method void shouldNotHaveBeenHandled()
- * @method void shouldReturn()
+ * @method void shouldReturn($value)
  * @method void shouldReturnAnInstanceOf()
  * @method $this shouldThrow()
  */

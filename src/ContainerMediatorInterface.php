@@ -2,7 +2,7 @@
 /**
  * Contains ContainerMediatorInterface Interface.
  *
- * PHP version 5.4
+ * PHP version 5.6
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)

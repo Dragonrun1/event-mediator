@@ -2,7 +2,7 @@
 /**
  * Contains MockEventTrait class.
  *
- * PHP version 5.4
+ * PHP version 5.6
  *
  * @copyright 2015-2016 Michael Cummings
  * @author    Michael Cummings <mgcummings@yahoo.com>

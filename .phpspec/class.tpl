@@ -2,12 +2,12 @@
 /**
  * Contains %name% class.
  *
- * PHP version 5.4
+ * PHP version 5.6
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
  * with minimum dependencies so it is easy to drop in and use.
- * Copyright (C) 2015 Michael Cummings
+ * Copyright (C) 2015-2016 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -31,7 +31,7 @@
 * You should also be able to find a copy of this license in the included
 * LICENSE file.
 *
-* @copyright 2015 Michael Cummings
+* @copyright 2015-2016 Michael Cummings
 * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
 * @author    Michael Cummings
 <mgcummings@yahoo.com>
