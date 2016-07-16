@@ -5,7 +5,7 @@
     "authors": [
         {
             "name": "Michael Cummings",
-            "email": "dragonaire@users.sourceforge.net",
+            "email": "mgcummings@yahoo.com",
             "role": "Developer"
         }
     ],
@@ -18,18 +18,20 @@
     "config": {
         "optimize-autoloader": true
     },
+    "homepage": "https://github.com/Dragonrun1/event-mediator",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "ext-SPL": "*",
-        "php": ">=5.4.1",
+        "php": ">=5.4.1, <7.2",
         "pimple/pimple": "~3.0"
     },
     "require-dev": {
-        "dragonrun1/phpspec": "dev-master",
+        "dragonrun1/phpspec": "2.1.*@dev",
         "phploc/phploc": "<2.3",
         "phpspec/nyan-formatters": "1.0.1",
         "henrikbjorn/phpspec-code-coverage": "1.0.1",
-        "symfony/console": "<2.7"
+        "satooshi/php-coveralls": "dev-master",
+        "symfony/console": "~2.7"
     }
 }
