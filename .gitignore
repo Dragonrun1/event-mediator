@@ -1,7 +1,7 @@
 .php_cs.cache
 composer.phar
-junk*.php
-test.php
+junk*.*
+test*.*
 composer.lock
 *.log
 .idea/
