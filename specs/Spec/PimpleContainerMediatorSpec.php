@@ -144,7 +144,6 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->setServiceContainer($container);
         $listener->method1($event, 'test1', $this)
                  ->shouldBeCalled();
-//        $this->getServiceByName('test1')->willReturn(['TestService', 'method1']);
         $this->trigger('test1', $event);
     }
     /** @noinspection MoreThanThreeArgumentsInspection */
