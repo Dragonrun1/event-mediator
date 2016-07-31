@@ -1,8 +1,9 @@
 <?php
+declare(strict_types = 1);
 /**
  * MediatorInterface.php
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
@@ -26,14 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
- * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015-2016 Michael Cummings
+ * @license   GPL-2.0
  */
 namespace EventMediator;
 
@@ -44,48 +45,61 @@ interface MediatorInterface
 {
     /**
      * @param string     $eventName
-     * @param array      $listener
+     * @param callable   $listener
      * @param int|string $priority
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      */
-    public function addListener($eventName, array $listener, $priority = 0);
+    public function addListener(string $eventName, callable $listener, $priority = 0): MediatorInterface;
+    /**
+     * @param array $events
+     *
+     * @return MediatorInterface Fluent interface.
+     */
+    public function addListenersByEventList(array $events): MediatorInterface;
     /**
      * @param SubscriberInterface $sub
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      */
-    public function addSubscriber(SubscriberInterface $sub);
+    public function addSubscriber(SubscriberInterface $sub): MediatorInterface;
     /**
      * @param string $eventName
      *
      * @return array
      */
-    public function getListeners($eventName = '');
+    public function getListeners(string $eventName = ''): array;
     /**
      * @param string $eventName
      *
      * @return bool
      */
-    public function hasListeners($eventName = '');
+    public function hasListeners(string $eventName = ''): bool;
     /**
-     * @param string $eventName
-     * @param array  $listener
+     * @param string     $eventName
+     * @param callable   $listener
+     * @param int|string $priority
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      */
-    public function removeListener($eventName, array $listener);
+    public function removeListener(string $eventName, callable $listener, $priority = 0): MediatorInterface;
+    /**
+     * @param array $events Events to be removed.
+     *
+     * @return MediatorInterface Fluent interface.
+     */
+    public function removeListenersByEventList(array $events): MediatorInterface;
     /**
      * @param SubscriberInterface $sub
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      */
-    public function removeSubscriber(SubscriberInterface $sub);
+    public function removeSubscriber(SubscriberInterface $sub): MediatorInterface;
     /**
      * @param string              $eventName
      * @param EventInterface|null $event
      *
      * @return EventInterface
      */
-    public function trigger($eventName, EventInterface $event = null);
+    public function trigger(string $eventName, EventInterface $event = null): EventInterface;
 }
