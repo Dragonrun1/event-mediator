@@ -1,12 +1,12 @@
 <?php
 /**
- * Contains PhpSpec %name% class.
+ * Contains PhpSpec class %name%.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
- * with minimum dependencies so it is easy to drop in and use.
+ * which has minimal dependencies so it is easy to drop in and use.
  * Copyright (C) 2015-2016 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,28 +26,27 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
-*
-* You should also be able to find a copy of this license in the included
-* LICENSE file.
-*
-* @copyright 2015-2016 Michael Cummings
-* @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
-* @author    Michael Cummings
-<mgcummings@yahoo.com>
-*/
+ * <http://spdx.org/licenses/GPL-2.0.html>.
+ *
+ * You should also be able to find a copy of this license in the included
+ * LICENSE file.
+ *
+ * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015-2016 Michael Cummings
+ * @license   GPL-2.0
+ */
 namespace %namespace%;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 /**
-* Class %name%
-*/
+ * Class %name%
+ */
 class %name% extends ObjectBehavior
 {
-public function it_is_initializable()
-{
-$this->shouldHaveType('%subject%');
-}
+    public function it_is_initializable()
+    {
+        $this->shouldHaveType('%subject%');
+    }
 }
