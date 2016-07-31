@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 /**
  * Contains MockListener class.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
@@ -26,14 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
- * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015-2016 Michael Cummings
+ * @license   GPL-2.0
  */
 namespace Spec\EventMediator;
 
@@ -55,7 +56,7 @@ class MockListener implements MockListenerInterface
      */
     public function method1(
         EventInterface $event,
-        $eventName,
+        string $eventName,
         MediatorInterface $mediator
     ) {
         // Dummy test method
@@ -70,7 +71,7 @@ class MockListener implements MockListenerInterface
      */
     public function method2(
         EventInterface $event,
-        $eventName,
+        string $eventName,
         MediatorInterface $mediator
     ) {
         return $event->eventHandled();
