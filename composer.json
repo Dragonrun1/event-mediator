@@ -10,28 +10,40 @@
         }
     ],
     "autoload": {
-        "psr-0": {"Spec\\": "specs/"},
+        "psr-0": {
+            "Spec\\": "specs/"
+        },
         "psr-4": {
-            "EventMediator\\": ["src/"]
+            "EventMediator\\": [
+                "src/"
+            ]
         }
     },
     "config": {
         "optimize-autoloader": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.*-dev"
+        }
     },
     "homepage": "https://github.com/Dragonrun1/event-mediator",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "ext-SPL": "*",
-        "php": ">=5.4.1, <7.2",
+        "php": ">=7.0, <7.2",
         "pimple/pimple": "~3.0"
     },
     "require-dev": {
-        "dragonrun1/phpspec": "2.1.*@dev",
-        "phploc/phploc": "<2.3",
-        "phpspec/nyan-formatters": "1.0.1",
-        "henrikbjorn/phpspec-code-coverage": "1.0.1",
+        "henrikbjorn/phpspec-code-coverage": "dev-master",
+        "phpspec/nyan-formatters": "~2.0.0",
+        "phpspec/phpspec": "~3.0.0",
+        "phpunit/php-code-coverage": "~4.0",
         "satooshi/php-coveralls": "dev-master",
-        "symfony/console": "~2.7"
+        "symfony/console": "~2.8"
+    },
+    "replace": {
+        "dragonrun1/event-mediator": "2.0.*"
     }
 }
