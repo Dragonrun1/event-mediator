@@ -146,13 +146,7 @@ class Mediator implements MediatorInterface
             }
             $key = array_search($listener, $listeners, true);
             if (false !== $key) {
-                unset($this->listeners[$eventName][$atPriority][$key]);
-                if (0 === count($this->listeners[$eventName][$atPriority])) {
-                    unset($this->listeners[$eventName][$atPriority]);
-                }
-                if (0 === count($this->listeners[$eventName])) {
-                    unset($this->listeners[$eventName]);
-                }
+                $this->bubbleUpUnsetListener($eventName, $atPriority, $key);
                 if ('first' === $priority) {
                     break;
                 }
@@ -283,6 +277,21 @@ class Mediator implements MediatorInterface
                     $callback($eventName, $listener, $priority);
                 }
             }
+        }
+    }
+    /**
+     * @param string $eventName
+     * @param int    $priority
+     * @param int    $key
+     */
+    private function bubbleUpUnsetListener(string $eventName, int $priority, int $key)
+    {
+        unset($this->listeners[$eventName][$priority][$key]);
+        if (0 === count($this->listeners[$eventName][$priority])) {
+            unset($this->listeners[$eventName][$priority]);
+        }
+        if (0 === count($this->listeners[$eventName])) {
+            unset($this->listeners[$eventName]);
         }
     }
     /**

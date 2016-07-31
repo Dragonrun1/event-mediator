@@ -179,17 +179,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             }
             $key = array_search($listener, $listeners, true);
             if (false !== $key) {
-                unset($this->serviceListeners[$eventName][$atPriority][$key]);
-                // Remove empty priorities.
-                if (0 === count($this->serviceListeners[$eventName][$atPriority])) {
-                    unset($this->serviceListeners[$eventName][$atPriority]);
-                }
-                // Remove empty events.
-                if (0 === count($this->serviceListeners[$eventName])) {
-                    unset($this->serviceListeners[$eventName]);
-                    $key = array_search($eventName, $this->loadedServices, true);
-                    unset($this->loadedServices[$key]);
-                }
+                $this->bubbleUpUnsetServiceListener($eventName, $atPriority, $key);
                 if ('first' === $priority) {
                     break;
                 }
@@ -262,6 +252,25 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             $priority = ($listenerM < $serviceM) ? $listenerM : $serviceM;
         }
         return (int)$priority;
+    }
+    /**
+     * @param string $eventName
+     * @param int    $priority
+     * @param int    $key
+     */
+    private function bubbleUpUnsetServiceListener(string $eventName, int $priority, int $key)
+    {
+        unset($this->serviceListeners[$eventName][$priority][$key]);
+        // Remove empty priorities.
+        if (0 === count($this->serviceListeners[$eventName][$priority])) {
+            unset($this->serviceListeners[$eventName][$priority]);
+        }
+        // Remove empty events.
+        if (0 === count($this->serviceListeners[$eventName])) {
+            unset($this->serviceListeners[$eventName]);
+            $key = array_search($eventName, $this->loadedServices, true);
+            unset($this->loadedServices[$key]);
+        }
     }
     /**
      * @param $listener
