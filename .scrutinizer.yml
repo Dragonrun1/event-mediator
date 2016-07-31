@@ -37,7 +37,10 @@ checks:
         align_assignments: false
         duplication: false
 filter:
+    paths: ["src/"]
     excluded_paths:
-        - 'tests/*'
-        - 'specs/*'
-        - 'vendor/*'
+        - "tests/*"
+        - "specs/*"
+        - "vendor/*"
+        - "junk*.*"
+        - "test*.*"
