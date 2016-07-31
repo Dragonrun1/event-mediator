@@ -22,11 +22,26 @@ Licensing information can be found in the [LICENSE](LICENSE) file.
 
 ## Introduction
 
-Most people might know event mediator as an event dispatcher instead and both names work. The reason I choose to call it
-a mediator is it follows the [mediator](https://en.wikipedia.org/wiki/Mediator_pattern) pattern. For those of you that
-are familiar with Symfony 2 and it's
-[EventDispatcher](http://symfony.com/doc/current/components/event_dispatcher/index.html) component then Event Mediator
-is basically a drop in replace for it without the huge dependence overhead (IMHO) often seen with Symfony components.
+Most people might know event mediator as an event dispatcher instead and both
+names would have worked. The reason I choose to call it a mediator is it follows
+the [mediator](https://en.wikipedia.org/wiki/Mediator_pattern) pattern. For
+those of you that are familiar with Symfony 2 and it's
+[EventDispatcher](http://symfony.com/doc/current/components/event_dispatcher/index.html)
+component then Event Mediator started out as basically a drop in replace for it
+without the (IMHO) huge dependence overhead often seen with Symfony components.
+Event Mediator has since grown into something better since then I think.
 
-To get a better understanding about Event-Mediator and how you might use it check out
-[Understanding Event-Mediator](docs/UnderstandingEventMediator.md) 
+To get a better understanding about Event-Mediator and how you might use it
+check out [Understanding Event-Mediator](docs/UnderstandingEventMediator.md) 
+
+## Changes
+
+  * Started new 2.0-dev branch with many BC breaking changes.
+  * The 1.0 series is now end of life and all application developers should
+  update to newer 2.0 versions ASAP. If your code only used the listener methods
+  the move should be easy with few changes needed. If application uses any of
+  the subscriber stuff you will need to update the returned event array to
+  reflect the new expected format.
+
+  For a more complete understand of the changes refer to the commit messages and
+  new code.
