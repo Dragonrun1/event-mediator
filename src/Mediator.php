@@ -1,8 +1,9 @@
 <?php
+declare(strict_types = 1);
 /**
  * Contains Mediator class.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
@@ -26,14 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
- * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015-2016 Michael Cummings
+ * @license   GPL-2.0
  */
 namespace EventMediator;
 
@@ -44,67 +45,49 @@ class Mediator implements MediatorInterface
 {
     /**
      * @param string     $eventName
-     * @param array      $listener
+     * @param callable   $listener
      * @param int|string $priority
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function addListener($eventName, array $listener, $priority = 0)
+    public function addListener(string $eventName, callable $listener, $priority = 0): MediatorInterface
     {
         $this->checkEventName($eventName);
-        $this->checkAllowedListener($listener);
         $priority = $this->getActualPriority($eventName, $priority);
-        if (array_key_exists($eventName, $this->listeners)
+        if (!(array_key_exists($eventName, $this->listeners)
             && array_key_exists($priority, $this->listeners[$eventName])
+            && in_array($listener, $this->listeners[$eventName][$priority], true))
         ) {
-            $key = array_search(
-                $listener,
-                $this->listeners[$eventName][$priority],
-                true
-            );
-            if (false !== $key) {
-                return $this;
-            }
+            $this->listeners[$eventName][$priority][] = $listener;
         }
-        $this->listeners[$eventName][$priority][] = $listener;
+        return $this;
+    }
+    /**
+     * @param array $events
+     *
+     * @return MediatorInterface Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function addListenersByEventList(array $events): MediatorInterface
+    {
+        $this->walkEventList($events, [$this, 'addListener']);
         return $this;
     }
     /**
      * @param SubscriberInterface $sub
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      * @throws \DomainException
      * @throws \InvalidArgumentException
+     * @throws \LengthException
      */
-    public function addSubscriber(SubscriberInterface $sub)
+    public function addSubscriber(SubscriberInterface $sub): MediatorInterface
     {
-        /**
-         * @type string|array $listeners
-         */
-        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
-            if (is_string($listeners)) {
-                $this->addListener($eventName, [$sub, $listeners]);
-                continue;
-            }
-            if (is_string($listeners[0])) {
-                $this->addListener(
-                    $eventName,
-                    [$sub, $listeners[0]],
-                    array_key_exists(1, $listeners) ? $listeners[1] : 0
-                );
-            } elseif (is_array($listeners)) {
-                foreach ($listeners as $listener) {
-                    $this->addListener(
-                        $eventName,
-                        [$sub, $listener[0]],
-                        array_key_exists(1, $listener) ? $listener[1] : 0
-                    );
-                }
-            }
-        }
-        return $this;
+        return $this->addListenersByEventList($sub->getSubscribedEvents());
     }
     /**
      * @param string $eventName
@@ -112,13 +95,8 @@ class Mediator implements MediatorInterface
      * @return array
      * @throws \InvalidArgumentException
      */
-    public function getListeners($eventName = '')
+    public function getListeners(string $eventName = ''): array
     {
-        if (!is_string($eventName)) {
-            $mess
-                = 'Event name MUST be a string, but given ' . gettype($eventName);
-            throw new \InvalidArgumentException($mess);
-        }
         $this->sortListeners($eventName);
         if ('' !== $eventName) {
             return array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
@@ -131,65 +109,77 @@ class Mediator implements MediatorInterface
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function hasListeners($eventName = '')
+    public function hasListeners(string $eventName = ''): bool
     {
         return (bool)$this->getListeners($eventName);
     }
     /**
-     * @param string $eventName
-     * @param array  $listener
+     * @param string     $eventName
+     * @param callable   $listener
+     * @param int|string $priority
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function removeListener($eventName, array $listener)
+    public function removeListener(string $eventName, callable $listener, $priority = 0): MediatorInterface
     {
         $this->checkEventName($eventName);
         if (!array_key_exists($eventName, $this->listeners)) {
             return $this;
         }
-        $this->checkAllowedListener($listener);
-        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+        /**
+         * @var array      $priorities
+         * @var int        $atPriority
+         * @var callable[] $listeners
+         */
+        if ('last' !== $priority) {
+            $priorities = $this->listeners[$eventName];
+        } else {
+            $priorities = array_reverse($this->listeners[$eventName], true);
+            $priority = 'first';
+        }
+        foreach ($priorities as $atPriority => $listeners) {
             $key = array_search($listener, $listeners, true);
             if (false !== $key) {
-                unset($this->listeners[$eventName][$priority][$key]);
-                if (0 === count($this->listeners[$eventName][$priority])) {
-                    unset($this->listeners[$eventName][$priority]);
+                unset($this->listeners[$eventName][$atPriority][$key]);
+                if (0 === count($this->listeners[$eventName][$atPriority])) {
+                    unset($this->listeners[$eventName][$atPriority]);
                 }
                 if (0 === count($this->listeners[$eventName])) {
                     unset($this->listeners[$eventName]);
+                }
+                if ('first' === $priority) {
+                    break;
                 }
             }
         }
         return $this;
     }
     /**
-     * @param SubscriberInterface $sub
+     * @param array $events Events to be removed.
      *
-     * @return $this Fluent interface
+     * @return MediatorInterface Fluent interface.
      * @throws \DomainException
      * @throws \InvalidArgumentException
+     * @throws \LengthException
      */
-    public function removeSubscriber(SubscriberInterface $sub)
+    public function removeListenersByEventList(array $events): MediatorInterface
     {
-        /**
-         * @type string|array $listeners
-         */
-        foreach ($sub->getSubscribedEvents() as $eventName => $listeners) {
-            if (is_string($listeners)) {
-                $this->removeListener($eventName, [$sub, $listeners]);
-                continue;
-            }
-            if (is_string($listeners[0])) {
-                $this->removeListener($eventName, [$sub, $listeners[0]]);
-            } elseif (is_array($listeners)) {
-                foreach ($listeners as $listener) {
-                    $this->removeListener($eventName, [$sub, $listener[0]]);
-                }
-            }
-        }
+        $this->walkEventList($events, [$this, 'removeListener']);
         return $this;
+    }
+    /**
+     * @param SubscriberInterface $sub
+     *
+     * @return MediatorInterface Fluent interface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function removeSubscriber(SubscriberInterface $sub): MediatorInterface
+    {
+        return $this->removeListenersByEventList($sub->getSubscribedEvents());
     }
     /**
      * @param string              $eventName
@@ -199,7 +189,7 @@ class Mediator implements MediatorInterface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function trigger($eventName, EventInterface $event = null)
+    public function trigger(string $eventName, EventInterface $event = null): EventInterface
     {
         $this->checkEventName($eventName);
         if (null === $event) {
@@ -208,14 +198,15 @@ class Mediator implements MediatorInterface
         $priorities = $this->getListeners($eventName);
         if (0 !== count($priorities)) {
             /**
-             * @type array $listeners
+             * @var array    $listeners
+             * @var callable $listener
              */
             foreach ($priorities as $listeners) {
                 foreach ($listeners as $listener) {
-                    call_user_func($listener, $event, $eventName, $this);
+                    $listener($event, $eventName, $this);
                     /** @noinspection DisconnectedForeachInstructionInspection */
                     if ($event->hasBeenHandled()) {
-                        return $event;
+                        break 2;
                     }
                 }
             }
@@ -223,110 +214,29 @@ class Mediator implements MediatorInterface
         return $event;
     }
     /**
-     * @param $listener
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    protected function checkAllowedListener($listener)
-    {
-        if (is_array($listener) && 2 === count($listener)) {
-            list($object, $method) = $listener;
-            $this->checkListenerMethod($method);
-            if (is_string($object)) {
-                $this->checkStringListenerObject($object, $method);
-                return;
-            }
-            if (is_object($object)) {
-                if (!in_array($method, get_class_methods($object), true)) {
-                    $mess = sprintf(
-                        'Listener class %1$s does NOT contain method %2$s',
-                        get_class($object),
-                        $method
-                    );
-                    throw new \InvalidArgumentException($mess);
-                }
-                return;
-            }
-            if (is_callable($object)) {
-                return;
-            }
-        }
-        $mess = 'Listener MUST be [object, "methodName"], ' . '["className", "methodName"], or '
-                . '[callable, "methodName"]';
-        throw new \InvalidArgumentException($mess);
-    }
-    /**
      * @param $eventName
      *
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    protected function checkEventName($eventName)
+    protected function checkEventName(string $eventName)
     {
-        if (!is_string($eventName)) {
-            $mess
-                = 'Event name MUST be a string, but given ' . gettype($eventName);
-            throw new \InvalidArgumentException($mess);
-        }
         if ('' === $eventName) {
             $mess = 'Event name can NOT be empty';
             throw new \DomainException($mess);
         }
-    }
-    /**
-     * @param string $method
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    protected function checkListenerMethod($method)
-    {
-        if (!is_string($method)) {
-            $mess = sprintf('Listener method name MUST be a string, but given %s', gettype($method));
-            throw new \InvalidArgumentException($mess);
-        }
-        if ('' === $method) {
-            $mess = 'Listener method can NOT be empty';
+        if (!ctype_print($eventName)) {
+            $mess = 'Using any non-printable characters in the event name is NOT allowed';
             throw new \DomainException($mess);
         }
     }
     /**
-     * @param $object
-     * @param $method
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    protected function checkStringListenerObject($object, $method)
-    {
-        if ('' === $object) {
-            $mess = 'Listener class name can NOT be empty';
-            throw new \DomainException($mess);
-        }
-        if (!class_exists($object)) {
-            $mess = sprintf(
-                'Listener class %s could NOT be found',
-                $object
-            );
-            throw new \DomainException($mess);
-        }
-        if (!in_array($method, get_class_methods($object), true)) {
-            $mess = sprintf(
-                'Listener class %1$s does NOT contain method %2$s',
-                $object,
-                $method
-            );
-            throw new \InvalidArgumentException($mess);
-        }
-    }
-    /**
-     * @param string $eventName
+     * @param string     $eventName
      * @param string|int $priority
      *
      * @return int
      */
-    protected function getActualPriority($eventName, $priority)
+    protected function getActualPriority(string $eventName, $priority): int
     {
         if ($priority === 'first') {
             $priority = !empty($this->listeners[$eventName]) ? max(array_keys($this->listeners[$eventName])) + 1 : 1;
@@ -338,12 +248,46 @@ class Mediator implements MediatorInterface
         return (int)$priority;
     }
     /**
+     * @param array    $events
+     * @param callable $callback
+     *
+     * @throws \LengthException
+     */
+    protected function walkEventList(array $events, callable $callback)
+    {
+        if (0 === count($events)) {
+            return;
+        }
+        /**
+         * @var string     $eventName
+         * @var array      $priorities
+         * @var int|string $priority
+         * @var array      $listeners
+         * @var array      $listener
+         */
+        foreach ($events as $eventName => $priorities) {
+            if (!is_array($priorities) || 0 === count($priorities)) {
+                $mess = 'Must have as least one priority per listed event';
+                throw new \LengthException($mess);
+            }
+            foreach ($priorities as $priority => $listeners) {
+                if (!is_array($listeners) || 0 === count($listeners)) {
+                    $mess = 'Must have at least one listener per listed priority';
+                    throw new \LengthException($mess);
+                }
+                foreach ($listeners as $listener) {
+                    $callback($eventName, $listener, $priority);
+                }
+            }
+        }
+    }
+    /**
      * @param string $eventName
      *
-     * @return $this
+     * @return MediatorInterface Fluent interface
      * @throws \InvalidArgumentException
      */
-    protected function sortListeners($eventName = '')
+    private function sortListeners(string $eventName = ''): MediatorInterface
     {
         if (0 === count($this->listeners)) {
             return $this;
@@ -357,13 +301,13 @@ class Mediator implements MediatorInterface
             ksort($this->listeners);
             $eventNames = array_keys($this->listeners);
         }
-        foreach ($eventNames as $eventName) {
-            krsort($this->listeners[$eventName], SORT_NUMERIC);
+        foreach ($eventNames as $anEvent) {
+            krsort($this->listeners[$anEvent], SORT_NUMERIC);
         }
         return $this;
     }
     /**
-     * @type array $listeners
+     * @var array $listeners
      */
-    protected $listeners = [];
+    private $listeners = [];
 }
