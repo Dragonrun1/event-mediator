@@ -10,6 +10,6 @@ php:
     - 7.1
 script:
     - mkdir -p build
-    - phpdbg -qrr -f vendor/dragonrun1/phpspec/bin/phpspec --no-interaction --config=phpspec_coverage.yml run
+    - phpdbg -qrr -f vendor/phpspec/phpspec/bin/phpspec --no-interaction --config=phpspec_coverage.yml run
 after_success:
     - travis_retry php vendor/bin/coveralls -v
