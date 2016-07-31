@@ -1,8 +1,9 @@
 <?php
+declare(strict_types = 1);
 /**
  * Contains Event class.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
@@ -26,14 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
- * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015-2016 Michael Cummings
+ * @license   GPL-2.0
  */
 namespace EventMediator;
 
@@ -45,9 +46,9 @@ class Event implements EventInterface
     /**
      * Listener uses this to let mediator know the event has been handled.
      *
-     * @return $this Fluent interface.
+     * @return EventInterface Fluent interface.
      */
-    public function eventHandled()
+    public function eventHandled(): EventInterface
     {
         $this->handled = true;
         return $this;
@@ -57,13 +58,14 @@ class Event implements EventInterface
      *
      * @return bool Returns true if listener claims to have handled event.
      */
-    public function hasBeenHandled()
+    public function hasBeenHandled(): bool
     {
         return $this->handled;
     }
     /**
      * Used to hold handled status.
-     * @type bool
+     *
+     * @var bool
      */
-    protected $handled = false;
+    private $handled = false;
 }
