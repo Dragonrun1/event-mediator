@@ -6,11 +6,21 @@ suites:
         spec_prefix: Spec
         src_path: src
 extensions:
-    - PhpSpec\Extension\CodeCoverageExtension
+    PhpSpecCodeCoverage\CodeCoverageExtension:
+        blacklist:
+            - build
+            - composer
+            - docs
+            - specs
+            - tests
+            - vendor
+        blacklist_files:
+            - bootstrap.php
+            - "Mock*.php"
+            - "*Spec.php"
+            - "*Test.php"
+        format:
+            - clover
+        output:
+            clover: build/clover.xml
 formatter.name: dot
-code_coverage:
-    format:
-        - clover
-    output:
-        clover: build/clover.xml
-    show_uncovered_files: false
