@@ -1,12 +1,13 @@
 <?php
+declare(strict_types = 1);
 /**
  * Contains ContainerMediatorInterface Interface.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
- * with minimum dependencies so it is easy to drop in and use.
+ * which has minimal dependencies so it is easy to drop in and use.
  * Copyright (C) 2015-2016 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,15 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
- * @author    Michael Cummings
- * <mgcummings@yahoo.com>
+ * @license   GPL-2.0
  */
 namespace EventMediator;
 
@@ -47,31 +47,26 @@ interface ContainerMediatorInterface extends MediatorInterface
      * Add a service as an event listener.
      *
      * @param string     $eventName Name of the event the listener is being added for.
-     * @param array      $listener  Listener to be added.
+     * @param array      $listener  Listener to be added. ['containerID', 'method']
      * @param int|string $priority  Priority level for the added listener.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    public function addServiceListener($eventName, array $listener, $priority = 0);
+    public function addServiceListener(string $eventName, array $listener, $priority = 0): ContainerMediatorInterface;
+    /**
+     * @param array $events
+     *
+     * @return ContainerMediatorInterface
+     */
+    public function addServiceListenersByEventList(array $events): ContainerMediatorInterface;
     /**
      * Add a service as a subscriber to event(s).
      *
-     * @param string              $serviceName Name of the event the subscriber is being added for.
-     * @param SubscriberInterface $sub         Subscriber to be added.
+     * @param ServiceSubscriberInterface $sub         Service subscriber to be added.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    public function addServiceSubscriber($serviceName, SubscriberInterface $sub);
-    /**
-     * Adds service as a subscriber to event(s) using a list like found in SubscriberInterface.
-     *
-     * @param string $serviceName Name of the event the subscriber is being added for.
-     * @param array  $eventList   List of events the subscriber wishes to be added for. This uses the same format as
-     *                            SubscriberInterface.
-     *
-     * @return $this Fluent interface.
-     */
-    public function addServiceSubscriberByEventList($serviceName, array $eventList);
+    public function addServiceSubscriber(ServiceSubscriberInterface $sub): ContainerMediatorInterface;
     /**
      * Get a list of service listeners for an event.
      *
@@ -83,35 +78,35 @@ interface ContainerMediatorInterface extends MediatorInterface
      * @return array List of event service listeners or empty array if event is unknown or has no listeners or
      *               subscribers.
      */
-    public function getServiceListeners($eventName = '');
+    public function getServiceListeners(string $eventName = ''): array;
     /**
      * Remove a service as an event listener.
      *
-     * @param string $eventName Event name that listener is being removed from.
-     * @param array  $listener  Service listener to be removed.
+     * @param string     $eventName Event name that listener is being removed from.
+     * @param array      $listener  Service listener to be removed.
+     * @param int|string $priority  Priority level for the to be removed listener.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    public function removeServiceListener($eventName, array $listener);
+    public function removeServiceListener(
+        string $eventName,
+        array $listener,
+        $priority = 0
+    ): ContainerMediatorInterface;
+    /**
+     * @param array $events
+     *
+     * @return ContainerMediatorInterface
+     */
+    public function removeServiceListenersByEventList(array $events): ContainerMediatorInterface;
     /**
      * Remove a service subscriber from event(s).
      *
-     * @param string              $serviceName Event name that subscriber is being removed from.
-     * @param SubscriberInterface $sub         Subscriber to be removed.
+     * @param ServiceSubscriberInterface $sub Subscriber to be removed.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    public function removeServiceSubscriber($serviceName, SubscriberInterface $sub);
-    /**
-     * Removes service as an subscriber to event(s) using a list of like found in SubscriberInterface.
-     *
-     * @param string $serviceName Event name that subscriber is being removed from.
-     * @param array  $eventList   List of events the subscriber wishes to be removed from. This uses the same format as
-     *                            SubscriberInterface.
-     *
-     * @return $this Fluent interface.
-     */
-    public function removeServiceSubscriberByEventList($serviceName, array  $eventList);
+    public function removeServiceSubscriber(ServiceSubscriberInterface $sub): ContainerMediatorInterface;
     /**
      * This is used to bring in the service container that will be used.
      *
@@ -125,7 +120,7 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @param mixed $value The service container to be used.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    public function setServiceContainer($value = null);
+    public function setServiceContainer($value = null): ContainerMediatorInterface;
 }
