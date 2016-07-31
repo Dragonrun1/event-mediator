@@ -1,12 +1,13 @@
 <?php
+declare(strict_types = 1);
 /**
  * Contains AbstractContainerMediator class.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * LICENSE:
  * This file is part of Event Mediator - A general event mediator (dispatcher)
- * with minimum dependencies so it is easy to drop in and use.
+ * which has minimal dependencies so it is easy to drop in and use.
  * Copyright (C) 2015-2016 Michael Cummings
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,15 +27,14 @@
  * Boston, MA 02111-1307 USA
  *
  * or find a electronic copy at
- * <http://www.gnu.org/licenses/>.
+ * <http://spdx.org/licenses/GPL-2.0.html>.
  *
  * You should also be able to find a copy of this license in the included
  * LICENSE file.
  *
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  * @copyright 2015-2016 Michael Cummings
- * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU GPL-2.0
- * @author    Michael Cummings
- * <mgcummings@yahoo.com>
+ * @license   GPL-2.0
  */
 namespace EventMediator;
 
@@ -43,6 +43,183 @@ namespace EventMediator;
  */
 abstract class AbstractContainerMediator extends Mediator implements ContainerMediatorInterface
 {
+    /**
+     * Add a service as an event listener.
+     *
+     * @param string     $eventName Name of the event the listener is being added for.
+     * @param array      $listener  Listener to be added. ['containerID', 'method']
+     * @param int|string $priority  Priority level for the added listener.
+     *
+     * @return ContainerMediatorInterface Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    public function addServiceListener(string $eventName, array $listener, $priority = 0): ContainerMediatorInterface
+    {
+        $this->checkEventName($eventName);
+        $this->checkAllowedServiceListener($listener);
+        $priority = $this->getActualPriority($eventName, $priority);
+        if (array_key_exists($eventName, $this->serviceListeners)
+            && array_key_exists($priority, $this->serviceListeners[$eventName])
+            && in_array($listener, $this->serviceListeners[$eventName][$priority], true)
+        ) {
+            return $this;
+        }
+        $this->serviceListeners[$eventName][$priority][] = $listener;
+        return $this;
+    }
+    /**
+     * @param array $events
+     *
+     * @return ContainerMediatorInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function addServiceListenersByEventList(array $events): ContainerMediatorInterface
+    {
+        $this->walkEventList($events, [$this, 'addServiceListener']);
+        return $this;
+    }
+    /**
+     * Add a service as a subscriber to event(s).
+     *
+     * @param ServiceSubscriberInterface $sub Service subscriber to be added.
+     *
+     * @return ContainerMediatorInterface Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function addServiceSubscriber(ServiceSubscriberInterface $sub): ContainerMediatorInterface
+    {
+        return $this->addServiceListenersByEventList($sub->getServiceSubscribedEvents());
+    }
+    /**
+     * @param string $eventName
+     *
+     * @return array
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    public function getListeners(string $eventName = ''): array
+    {
+        $this->lazyLoadServices($eventName);
+        return parent::getListeners($eventName);
+    }
+    /** @noinspection GenericObjectTypeUsageInspection */
+    /**
+     * This method is used any time the mediator need to get the actual instance
+     * of the class for an event.
+     *
+     * Normal will only be called during actual trigger of an event since lazy
+     * loading is used.
+     *
+     * @param string $serviceName
+     *
+     * @return object
+     */
+    abstract public function getServiceByName(string $serviceName);
+    /**
+     * Get a list of service listeners for an event.
+     *
+     * Note that if event name is empty all listeners will be returned. Any event subscribers are also included in the
+     * list.
+     *
+     * @param string $eventName Name of the event the list of service listeners is needed for.
+     *
+     * @return array List of event service listeners or empty array if event is unknown or has no listeners or
+     *               subscribers.
+     * @throws \InvalidArgumentException
+     */
+    public function getServiceListeners(string $eventName = ''): array
+    {
+        $this->sortServiceListeners($eventName);
+        if ('' !== $eventName) {
+            return (!empty($this->serviceListeners[$eventName])) ? $this->serviceListeners[$eventName] : [];
+        }
+        return $this->serviceListeners;
+    }
+    /**
+     * Remove a service as an event listener.
+     *
+     * @param string     $eventName Event name that listener is being removed from.
+     * @param array      $listener  Service listener to be removed.
+     * @param int|string $priority  Priority level for the to be removed listener.
+     *
+     * @return ContainerMediatorInterface Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    public function removeServiceListener(string $eventName, array $listener, $priority = 0): ContainerMediatorInterface
+    {
+        $this->checkEventName($eventName);
+        if (!array_key_exists($eventName, $this->serviceListeners)) {
+            return $this;
+        }
+        $this->checkAllowedServiceListener($listener);
+        if (in_array($eventName, $this->loadedServices, true)) {
+            list($class, $method) = $listener;
+            $class = $this->getServiceByName($class);
+            $this->removeListener($eventName, [$class, $method], $priority);
+        }
+        /**
+         * @var array      $priorities
+         * @var int|string $atPriority
+         * @var array      $listeners
+         */
+        if ('last' !== $priority) {
+            $priorities = $this->serviceListeners[$eventName];
+        } else {
+            $priorities = array_reverse($this->serviceListeners[$eventName], true);
+            $priority = 'first';
+        }
+        foreach ($priorities as $atPriority => $listeners) {
+            $key = array_search($listener, $listeners, true);
+            if (false !== $key) {
+                unset($this->serviceListeners[$eventName][$atPriority][$key]);
+                // Remove empty priorities.
+                if (0 === count($this->serviceListeners[$eventName][$atPriority])) {
+                    unset($this->serviceListeners[$eventName][$atPriority]);
+                }
+                // Remove empty events.
+                if (0 === count($this->serviceListeners[$eventName])) {
+                    unset($this->serviceListeners[$eventName]);
+                }
+                if ('first' === $priority) {
+                    break;
+                }
+            }
+        }
+        return $this;
+    }
+    /**
+     * @param array $events
+     *
+     * @return ContainerMediatorInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function removeServiceListenersByEventList(array $events): ContainerMediatorInterface
+    {
+        $this->walkEventList($events, [$this, 'removeServiceListener']);
+        return $this;
+    }
+    /**
+     * Remove a service subscriber from event(s).
+     *
+     * @param ServiceSubscriberInterface $sub Subscriber to be removed.
+     *
+     * @return ContainerMediatorInterface Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LengthException
+     */
+    public function removeServiceSubscriber(ServiceSubscriberInterface $sub): ContainerMediatorInterface
+    {
+        return $this->removeServiceListenersByEventList($sub->getServiceSubscribedEvents());
+    }
     /**
      * This is used to bring in the service container that will be used.
      *
@@ -56,260 +233,16 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      *
      * @param mixed $value The service container to be used.
      *
-     * @return $this Fluent interface.
+     * @return ContainerMediatorInterface Fluent interface.
      */
-    abstract public function setServiceContainer($value = null);
-    /**
-     * Add a service as an event listener.
-     *
-     * @param string     $eventName Name of the event the listener is being added for.
-     * @param array      $listener  Listener to be added.
-     * @param int|string $priority  Priority level for the added listener.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function addServiceListener($eventName, array $listener, $priority = 0)
-    {
-        $this->checkEventName($eventName);
-        $this->checkAllowedServiceListener($listener);
-        $priority = $this->getActualPriority($eventName, $priority);
-        if (array_key_exists($eventName, $this->serviceListeners)
-            && array_key_exists($priority, $this->serviceListeners[$eventName])
-        ) {
-            $key = array_search($listener, $this->serviceListeners[$eventName][$priority], true);
-            if (false !== $key) {
-                return $this;
-            }
-        }
-        $this->serviceListeners[$eventName][$priority][] = $listener;
-        return $this;
-    }
-    /**
-     * Add a service as a subscriber to event(s).
-     *
-     * @param string              $serviceName Name of the event the subscriber is being added for.
-     * @param SubscriberInterface $sub         Subscriber to be added.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function addServiceSubscriber($serviceName, SubscriberInterface $sub)
-    {
-        return $this->addServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
-    }
-    /**
-     * Adds service as a subscriber to event(s) using a list like found in SubscriberInterface.
-     *
-     * @param string $serviceName Name of the event the subscriber is being added for.
-     * @param array  $eventList   List of events the subscriber wishes to be added for. This uses the same format as
-     *                            SubscriberInterface.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function addServiceSubscriberByEventList($serviceName, array $eventList)
-    {
-        if (0 === count($eventList)) {
-            return $this;
-        }
-        /**
-         * @type string|array $listeners
-         */
-        foreach ($eventList as $eventName => $listeners) {
-            $this->checkEventName($eventName);
-            if (is_string($listeners)) {
-                $this->addServiceListener($eventName, [$serviceName, $listeners]);
-                continue;
-            }
-            if (is_string($listeners[0])) {
-                $this->addServiceListener($eventName, [$serviceName, $listeners[0]],
-                    array_key_exists(1, $listeners) ? $listeners[1] : 0);
-                continue;
-            }
-            if (is_array($listeners)) {
-                foreach ($listeners as $listener) {
-                    $this->addServiceListener($eventName, [$serviceName, $listener[0]],
-                        array_key_exists(1, $listener) ? $listener[1] : 0);
-                }
-            }
-        }
-        return $this;
-    }
-    /**
-     * @param string $eventName
-     *
-     * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function getListeners($eventName = '')
-    {
-        if (!is_string($eventName)) {
-            $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
-            throw new \InvalidArgumentException($mess);
-        }
-        $this->lazyLoadServices($eventName);
-        return parent::getListeners($eventName);
-    }
-    /**
-     * Get a list of service listeners for an event.
-     *
-     * Note that if event name is empty all listeners will be returned. Any event subscribers are also included in the
-     * list.
-     *
-     * @param string $eventName Name of the event the list of service listeners is needed for.
-     *
-     * @return array List of event service listeners or empty array if event is unknown or has no listeners or
-     *               subscribers.
-     * @throws \InvalidArgumentException
-     */
-    public function getServiceListeners($eventName = '')
-    {
-        if (!is_string($eventName)) {
-            $mess = sprintf('Event name MUST be a string, but given %s', gettype($eventName));
-            throw new \InvalidArgumentException($mess);
-        }
-        $this->sortServiceListeners($eventName);
-        if ('' !== $eventName) {
-            return (!empty($this->serviceListeners[$eventName])) ? $this->serviceListeners[$eventName] : [];
-        }
-        return $this->serviceListeners;
-    }
-    /**
-     * Remove a service as an event listener.
-     *
-     * @param string $eventName Event name that listener is being removed from.
-     * @param array  $listener  Service listener to be removed.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function removeServiceListener($eventName, array $listener)
-    {
-        $this->checkEventName($eventName);
-        if (!array_key_exists($eventName, $this->serviceListeners)) {
-            return $this;
-        }
-        $this->checkAllowedServiceListener($listener);
-        if (in_array($eventName, $this->loadedServices, true)) {
-            list($class, $method) = $listener;
-            $class = $this->getServiceByName($class);
-            $this->removeListener($eventName, [$class, $method]);
-        }
-        foreach ($this->serviceListeners[$eventName] as $priority => $listeners) {
-            $key = array_search($listener, $listeners, true);
-            if (false !== $key) {
-                unset($this->serviceListeners[$eventName][$priority][$key]);
-                // Remove empty priorities.
-                if (0 === count($this->serviceListeners[$eventName][$priority])) {
-                    unset($this->serviceListeners[$eventName][$priority]);
-                }
-                // Remove empty events.
-                if (0 === count($this->serviceListeners[$eventName])) {
-                    unset($this->serviceListeners[$eventName]);
-                }
-            }
-        }
-        return $this;
-    }
-    /**
-     * Remove a service subscriber from event(s).
-     *
-     * @param string              $serviceName Event name that subscriber is being removed from.
-     * @param SubscriberInterface $sub         Subscriber to be removed.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function removeServiceSubscriber($serviceName, SubscriberInterface $sub)
-    {
-        return $this->removeServiceSubscriberByEventList($serviceName, $sub->getSubscribedEvents());
-    }
-    /**
-     * Removes service as an subscriber to event(s) using a list of like found in SubscriberInterface.
-     *
-     * @param string $serviceName Event name that subscriber is being removed from.
-     * @param array  $eventList   List of events the subscriber wishes to be removed from. This uses the same format as
-     *                            SubscriberInterface.
-     *
-     * @return $this Fluent interface.
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    public function removeServiceSubscriberByEventList($serviceName, array  $eventList)
-    {
-        /**
-         * @type string|array $listeners
-         */
-        foreach ($eventList as $eventName => $listeners) {
-            if (is_string($listeners)) {
-                $this->removeServiceListener($eventName, [$serviceName, $listeners]);
-                continue;
-            }
-            if (is_string($listeners[0])) {
-                $this->removeServiceListener($eventName, [$serviceName, $listeners[0]]);
-            } elseif (is_array($listeners)) {
-                foreach ($listeners as $listener) {
-                    $this->removeServiceListener($eventName, [$serviceName, $listener[0]]);
-                }
-            }
-        }
-        return $this;
-    }
-    /**
-     * This method is used any time the mediator need to get the actual instance
-     * of the class for an event.
-     *
-     * Normal will only be called during actual trigger of an event since lazy
-     * loading is used.
-     *
-     * @param string $serviceName
-     *
-     * @return array
-     */
-    abstract protected function getServiceByName($serviceName);
-    /**
-     * @param $listener
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     */
-    protected function checkAllowedServiceListener($listener)
-    {
-        if (is_array($listener) && 2 === count($listener)) {
-            list($class, $method) = $listener;
-            if (!is_string($method)) {
-                $mess = sprintf('Service listener method name MUST be a string, but given %s', gettype($method));
-                throw new \InvalidArgumentException($mess);
-            }
-            if ('' === $method) {
-                $mess = 'Listener method can NOT be empty';
-                throw new \DomainException($mess);
-            }
-            if (is_string($class)) {
-                if ('' === $class) {
-                    $mess = 'Service listener class name can NOT be empty';
-                    throw new \DomainException($mess);
-                }
-                return;
-            }
-        }
-        $mess = 'Service listener MUST be ["className", "methodName"]';
-        throw new \InvalidArgumentException($mess);
-    }
+    abstract public function setServiceContainer($value = null): ContainerMediatorInterface;
     /**
      * @param string     $eventName
      * @param string|int $priority
      *
      * @return int
      */
-    protected function getActualPriority($eventName, $priority)
+    protected function getActualPriority(string $eventName, $priority): int
     {
         if (is_int($priority)) {
             return $priority;
@@ -327,22 +260,45 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         return (int)$priority;
     }
     /**
-     * Used to get the service container.
+     * @param $listener
      *
-     * @return mixed
+     * @throws \InvalidArgumentException
      */
-    protected function getServiceContainer()
+    private function checkAllowedServiceListener($listener)
     {
-        return $this->serviceContainer;
+        if (is_array($listener) && 2 === count($listener)) {
+            list($containerID, $method) = $listener;
+            if (!is_string($method)) {
+                $mess = sprintf('Service listener method name MUST be a string, but was given %s', gettype($method));
+                throw new \InvalidArgumentException($mess);
+            }
+            if (!is_string($containerID)) {
+                $mess = sprintf('Service listener container ID MUST be a string, but was given %s',
+                    gettype($containerID));
+                throw new \InvalidArgumentException($mess);
+            }
+            if (!ctype_print($method) || false === preg_match('%\w{1,}%', $method)) {
+                $mess = 'Service listener method name format is invalid, was given ' . $method;
+                throw new \InvalidArgumentException($mess);
+            }
+            // Also catches empty string.
+            if (!ctype_print($containerID)) {
+                $mess = 'Using any non-printable characters in the container ID is NOT allowed';
+                throw new \InvalidArgumentException($mess);
+            }
+            return;
+        }
+        $mess = 'Service listener form MUST be ["containerID", "methodName"]';
+        throw new \InvalidArgumentException($mess);
     }
     /**
      * @param string $eventName
      *
-     * @return $this Fluent interface
+     * @return ContainerMediatorInterface Fluent interface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    protected function lazyLoadServices($eventName = '')
+    private function lazyLoadServices(string $eventName = ''): ContainerMediatorInterface
     {
         if (0 === count($this->serviceListeners)) {
             return $this;
@@ -355,15 +311,24 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         } else {
             $eventNames = array_keys($this->serviceListeners);
         }
-        foreach ($eventNames as $eventName) {
-            if (!in_array($eventName, $this->loadedServices, true)) {
-                $this->loadedServices[] = $eventName;
+        foreach ($eventNames as $event) {
+            if (!in_array($event, $this->loadedServices, true)) {
+                $this->loadedServices[] = $event;
             }
-            foreach ($this->serviceListeners[$eventName] as $priority => $listeners) {
+            /** @noinspection GenericObjectTypeUsageInspection */
+            /**
+             * @var array  $priorities
+             * @var int    $priority
+             * @var array  $listeners
+             * @var object $class
+             * @var string $method
+             */
+            $priorities = $this->serviceListeners[$event];
+            foreach ($priorities as $priority => $listeners) {
                 foreach ($listeners as $listener) {
-                    list($class, $method) = $listener;
-                    $class = $this->getServiceByName($class);
-                    $this->addListener($eventName, [$class, $method], $priority);
+                    list($containerID, $method) = $listener;
+                    $class = $this->getServiceByName($containerID);
+                    $this->addListener($event, [$class, $method], $priority);
                 }
             }
         }
@@ -372,9 +337,10 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * @param string $eventName
      *
-     * @return $this Fluent Interface
+     * @return ContainerMediatorInterface Fluent Interface
+     * @throws \InvalidArgumentException
      */
-    protected function sortServiceListeners($eventName)
+    private function sortServiceListeners(string $eventName): ContainerMediatorInterface
     {
         if (0 === count($this->serviceListeners)) {
             return $this;
@@ -386,29 +352,22 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             $eventNames = [$eventName];
         } else {
             ksort($this->serviceListeners);
-            $eventNames = array_keys($this->listeners);
+            $eventNames = array_keys(parent::getListeners(''));
         }
-        foreach ($eventNames as $eventName) {
-            krsort($this->serviceListeners[$eventName], SORT_NUMERIC);
+        foreach ($eventNames as $anEvent) {
+            krsort($this->serviceListeners[$anEvent], SORT_NUMERIC);
         }
         return $this;
     }
     /**
      * List of already loaded services.
-     * @type array $loadedServices
-     */
-    protected $loadedServices = [];
-    /**
-     * Holds the container instance to be used.
      *
-     * @type mixed $serviceContainer
+     * @var string[] $loadedServices
      */
-    protected $serviceContainer;
+    private $loadedServices = [];
     /**
-     * Holds the list of service listeners that will be lazy loaded when events
-     * are triggered.
-     *
-     * @type array $serviceListeners
+     * @var array $serviceListeners Holds the list of service listeners that will be lazy loaded when events are
+     * triggered.
      */
-    protected $serviceListeners = [];
+    private $serviceListeners = [];
 }
