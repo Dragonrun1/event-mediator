@@ -136,7 +136,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     {
         $this->sortServiceListeners($eventName);
         if ('' !== $eventName) {
-            return (!empty($this->serviceListeners[$eventName])) ? $this->serviceListeners[$eventName] : [];
+            return array_key_exists($eventName, $this->serviceListeners) ? $this->serviceListeners[$eventName] : [];
         }
         return $this->serviceListeners;
     }
@@ -159,9 +159,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         }
         $this->checkAllowedServiceListener($listener);
         if (in_array($eventName, $this->loadedServices, true)) {
-            list($class, $method) = $listener;
-            $class = $this->getServiceByName($class);
-            $this->removeListener($eventName, [$class, $method], $priority);
+            $this->removeListener($eventName, [$this->getServiceByName($listener[0]), $listener[1]], $priority);
         }
         /**
          * @var array      $priorities
@@ -174,7 +172,11 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             $priorities = array_reverse($this->serviceListeners[$eventName], true);
             $priority = 'first';
         }
+        $isIntPriority = is_int($priority);
         foreach ($priorities as $atPriority => $listeners) {
+            if ($isIntPriority && $priority !== $atPriority) {
+                continue;
+            }
             $key = array_search($listener, $listeners, true);
             if (false !== $key) {
                 unset($this->serviceListeners[$eventName][$atPriority][$key]);
@@ -185,6 +187,8 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
                 // Remove empty events.
                 if (0 === count($this->serviceListeners[$eventName])) {
                     unset($this->serviceListeners[$eventName]);
+                    $key = array_search($eventName, $this->loadedServices, true);
+                    unset($this->loadedServices[$key]);
                 }
                 if ('first' === $priority) {
                     break;
@@ -315,20 +319,16 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
             if (!in_array($event, $this->loadedServices, true)) {
                 $this->loadedServices[] = $event;
             }
-            /** @noinspection GenericObjectTypeUsageInspection */
             /**
-             * @var array  $priorities
-             * @var int    $priority
-             * @var array  $listeners
-             * @var object $class
-             * @var string $method
+             * @var array $priorities
+             * @var int   $priority
+             * @var array $listeners
+             * @var array $listener
              */
             $priorities = $this->serviceListeners[$event];
             foreach ($priorities as $priority => $listeners) {
                 foreach ($listeners as $listener) {
-                    list($containerID, $method) = $listener;
-                    $class = $this->getServiceByName($containerID);
-                    $this->addListener($event, [$class, $method], $priority);
+                    $this->addListener($event, [$this->getServiceByName($listener[0]), $listener[1]], $priority);
                 }
             }
         }

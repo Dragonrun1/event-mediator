@@ -201,8 +201,8 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
             ['event2', 'containerID1', 'method1', 0]
         ];
         foreach ($listeners as $listener) {
-            list($event, $class, $method, $priority) = $listener;
-            $this->addServiceListener($event, [$class, $method], $priority);
+            list($event, $containerID, $method, $priority) = $listener;
+            $this->addServiceListener($event, [$containerID, $method], $priority);
         }
         $this->getServiceListeners()
              ->shouldHaveCount(2);
@@ -212,6 +212,9 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
              ->shouldHaveKey('event2');
         $this->getServiceListeners('event1')
              ->shouldHaveCount(2);
+        $this->removeServiceListener('event1', ['containerID1', 'method1'], 'first');
+        $this->getServiceListeners('event1')
+             ->shouldHaveCount(1);
         $this->removeServiceListener('event1', ['containerID1', 'method1']);
         $this->getServiceListeners('event1')
              ->shouldHaveCount(0);
