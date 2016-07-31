@@ -40,7 +40,6 @@
         "phpspec/nyan-formatters": "~2.0.0",
         "phpspec/phpspec": "~3.0.0",
         "phpunit/php-code-coverage": "~4.0",
-        "satooshi/php-coveralls": "dev-master",
         "symfony/console": "~2.8"
     },
     "replace": {
