@@ -247,6 +247,9 @@ class MediatorSpec extends ObjectBehavior
              ->shouldHaveCount(2);
         $this->removeListener('event1', [$listener, 'method1']);
         $this->getListeners('event1')
+             ->shouldHaveCount(1);
+        $this->removeListener('event1', [$listener, 'method1'], 'first');
+        $this->getListeners('event1')
              ->shouldHaveCount(0);
         $this->getListeners()
              ->shouldHaveCount(1);

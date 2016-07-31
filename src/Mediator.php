@@ -139,7 +139,11 @@ class Mediator implements MediatorInterface
             $priorities = array_reverse($this->listeners[$eventName], true);
             $priority = 'first';
         }
+        $isIntPriority = is_int($priority);
         foreach ($priorities as $atPriority => $listeners) {
+            if ($isIntPriority && $priority !== $atPriority) {
+                continue;
+            }
             $key = array_search($listener, $listeners, true);
             if (false !== $key) {
                 unset($this->listeners[$eventName][$atPriority][$key]);
