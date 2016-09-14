@@ -104,7 +104,13 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      */
     public function getListeners(string $eventName = ''): array
     {
-        $this->lazyLoadServices($eventName);
+        if (0 !== count($this->serviceListeners)) {
+            if ('' === $eventName) {
+                $this->lazyLoadServices(array_keys($this->serviceListeners));
+            } elseif (array_key_exists($eventName, $this->serviceListeners)) {
+                $this->lazyLoadServices([$eventName]);
+            }
+        }
         return parent::getListeners($eventName);
     }
     /** @noinspection GenericObjectTypeUsageInspection */
@@ -235,23 +241,26 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
      * @param string|int $priority
      *
      * @return int
+     * @throws \InvalidArgumentException
      */
     protected function getActualPriority(string $eventName, $priority): int
     {
         if (is_int($priority)) {
             return $priority;
         }
+        if (!in_array($priority, ['first', 'last'], true)) {
+            $mess = 'Unknown priority was given only "first", "last", or integer may be used';
+            throw new \InvalidArgumentException($mess);
+        }
         $listenerM = parent::getActualPriority($eventName, $priority);
         if ($priority === 'first') {
             $serviceM = array_key_exists($eventName, $this->serviceListeners)
                 ? max(array_keys($this->serviceListeners[$eventName])) + 1 : 1;
-            $priority = ($listenerM > $serviceM) ? $listenerM : $serviceM;
-        } elseif ($priority === 'last') {
-            $serviceM = array_key_exists($eventName, $this->serviceListeners)
-                ? min(array_keys($this->serviceListeners[$eventName])) - 1 : -1;
-            $priority = ($listenerM < $serviceM) ? $listenerM : $serviceM;
+            return ($listenerM > $serviceM) ? $listenerM : $serviceM;
         }
-        return (int)$priority;
+        $serviceM = array_key_exists($eventName, $this->serviceListeners)
+            ? min(array_keys($this->serviceListeners[$eventName])) - 1 : -1;
+        return ($listenerM < $serviceM) ? $listenerM : $serviceM;
     }
     /**
      * @param string $eventName
@@ -305,25 +314,14 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         throw new \InvalidArgumentException($mess);
     }
     /**
-     * @param string $eventName
+     * @param array $eventNames
      *
      * @return ContainerMediatorInterface Fluent interface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    private function lazyLoadServices(string $eventName = ''): ContainerMediatorInterface
+    private function lazyLoadServices(array $eventNames): ContainerMediatorInterface
     {
-        if (0 === count($this->serviceListeners)) {
-            return $this;
-        }
-        if ('' !== $eventName) {
-            if (!array_key_exists($eventName, $this->serviceListeners)) {
-                return $this;
-            }
-            $eventNames = [$eventName];
-        } else {
-            $eventNames = array_keys($this->serviceListeners);
-        }
         foreach ($eventNames as $event) {
             if (!in_array($event, $this->loadedServices, true)) {
                 $this->loadedServices[] = $event;

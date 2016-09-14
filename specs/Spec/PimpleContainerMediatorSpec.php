@@ -513,4 +513,10 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
                  ->during('removeServiceListener', ['test', ['\DummyClass', $methodName]]);
         }
     }
+    public function it_throws_exception_for_unknown_priorities_when_trying_to_add_service_listener()
+    {
+        $mess = 'Unknown priority was given only "first", "last", or integer may be used';
+            $this->shouldThrow(new \InvalidArgumentException($mess))
+                 ->during('addServiceListener', ['test', ['\DummyClass', 'method1'], 'Yoo!']);
+    }
 }
