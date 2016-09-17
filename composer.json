@@ -38,7 +38,7 @@
     "require-dev": {
         "henrikbjorn/phpspec-code-coverage": "dev-master",
         "phpspec/nyan-formatters": "~2.0.0",
-        "phpspec/phpspec": "~3.0.0",
+        "phpspec/phpspec": "~3.1.0",
         "phpunit/php-code-coverage": "~4.0",
         "symfony/console": "~2.8"
     },
