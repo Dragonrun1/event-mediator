@@ -174,7 +174,7 @@ class MediatorSpec extends ObjectBehavior
         Event $event
     ) {
         $event->hasBeenHandled()
-              ->willReturn(false);
+              ->willReturn(\false);
         $this->addListener('test1', [$listener, 'method1']);
         $this->addListener('test1', [$listener, 'method2']);
         $this->addListener('test1', [$listener, 'method1'], 'first');
@@ -210,7 +210,7 @@ class MediatorSpec extends ObjectBehavior
         Event $event
     ) {
         $event->hasBeenHandled()
-              ->willReturn(false);
+              ->willReturn(\false);
         $listener->method1($event, 'test1', $this)
                  ->willReturn($event);
         $this->addListener('test1', [$listener, 'method1']);
@@ -364,7 +364,7 @@ class MediatorSpec extends ObjectBehavior
         $this->getListeners()
              ->shouldHaveKey('test2');
         $event->hasBeenHandled()
-              ->willReturn(true);
+              ->willReturn(\true);
         /** @noinspection PhpStrictTypeCheckingInspection */
         $listener2->method2(Argument::type('\EventMediator\EventInterface'), Argument::is('test2'), $this)
                   ->shouldBeCalled();
@@ -388,7 +388,7 @@ class MediatorSpec extends ObjectBehavior
         Event $event
     ) {
         $event->hasBeenHandled()
-              ->willReturn(true)
+              ->willReturn(\true)
               ->shouldBeCalled();
         $listener->method2($event, 'test1', $this)
                  ->willReturn($event);
@@ -447,7 +447,7 @@ class MediatorSpec extends ObjectBehavior
     }
     public function it_still_returns_an_event_from_trigger_even_if_none_given()
     {
-        $this->trigger('test', null)
+        $this->trigger('test', \null)
              ->shouldReturnAnInstanceOf('EventMediator\EventInterface');
     }
     public function it_throws_exception_for_empty_event_name_when_adding_listener(MockListener $listener)

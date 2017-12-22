@@ -48,7 +48,7 @@ trait EventTrait
      */
     public function eventHandled(): EventInterface
     {
-        $this->handled = true;
+        $this->handled = \true;
         return $this;
     }
     /**
@@ -61,5 +61,5 @@ trait EventTrait
     /**
      * @var bool
      */
-    private $handled = false;
+    private $handled = \false;
 }

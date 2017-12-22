@@ -135,7 +135,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         Container $container
     ) {
         $event->hasBeenHandled()
-              ->willReturn(false);
+              ->willReturn(\false);
         $this->addServiceListener('test1', ['ContainerID1', 'method1']);
         $this->getServiceListeners()
              ->shouldHaveKey('test1');
@@ -175,7 +175,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
             ]
         ];
         $event->hasBeenHandled()
-              ->willReturn(false);
+              ->willReturn(\false);
         $listener->method1($event, 'test1', $this)
                  ->willReturn($event);
         $sub->getServiceSubscribedEvents()
@@ -355,7 +355,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $this->getListeners()
              ->shouldHaveKey('test2');
         $event->hasBeenHandled()
-              ->willReturn(true);
+              ->willReturn(\true);
         /** @noinspection PhpStrictTypeCheckingInspection */
         $listener2->method2($event, Argument::is('test2'), $this)
                   ->shouldBeCalled();
@@ -411,7 +411,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
             ]
         ];
         $event->hasBeenHandled()
-              ->willReturn(false);
+              ->willReturn(\false);
         $sub->getServiceSubscribedEvents()
             ->willReturn($events);
         $this->addServiceSubscriber($sub);
@@ -465,9 +465,9 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
     public function it_throws_exception_for_incorrect_service_container_type_when_trying_to_set_container(
         MockSubscriber $sub
     ) {
-        $mess = sprintf(
+        $mess = \sprintf(
             'Must be an instance of Pimple Container but given %s',
-            gettype($sub)
+            \gettype($sub)
         );
         $this->shouldThrow(new \InvalidArgumentException($mess))
              ->during('setServiceContainer', [$sub]);
@@ -476,13 +476,13 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
     {
         $listeners = [
             [123, 'method1'],
-            [true, 'method1'],
-            [null, 'method1']
+            [\true, 'method1'],
+            [\null, 'method1']
         ];
         $mess = 'Service listener container ID MUST be a string, but was given ';
         foreach ($listeners as $listener) {
             list($class, $method) = $listener;
-            $this->shouldThrow(new \InvalidArgumentException($mess . gettype($class)))
+            $this->shouldThrow(new \InvalidArgumentException($mess . \gettype($class)))
                  ->during('addServiceListener', ['test', [$class, $method]]);
         }
     }
@@ -491,7 +491,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $messages = [
             'array' => [],
             'integer' => 0,
-            'NULL' => null
+            'NULL' => \null
         ];
         foreach ($messages as $mess => $methodName) {
             $mess = 'Service listener method name MUST be a string, but was given ' . $mess;
@@ -505,7 +505,7 @@ class PimpleContainerMediatorSpec extends ObjectBehavior
         $messages = [
             'array' => [],
             'integer' => 0,
-            'NULL' => null
+            'NULL' => \null
         ];
         foreach ($messages as $mess => $methodName) {
             $mess = 'Service listener method name MUST be a string, but was given ' . $mess;

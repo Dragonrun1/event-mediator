@@ -1,4 +1,7 @@
 <?php
+
+use Composer\Autoload\ClassLoader;
+
 /**
  * Contains auto loader bootstrap.
  *
@@ -38,30 +41,30 @@
 /*
  * Nothing to do if Composer auto loader already exists.
  */
-if (class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
+if (\class_exists(ClassLoader::class, \false)) {
     return;
 }
 /*
  * Find Composer auto loader after striping away any vendor path.
  */
-$path = str_replace('\\', '/', __DIR__);
-$vendorPos = strpos($path, 'vendor/');
-if (false !== $vendorPos) {
-    $path = substr($path, 0, $vendorPos);
+$path = \str_replace('\\', '/', __DIR__);
+$vendorPos = \strpos($path, 'vendor/');
+if (\false !== $vendorPos) {
+    $path = \substr($path, 0, $vendorPos);
 }
 /*
  * Turn off warning messages for the following include.
  */
-$errorReporting = error_reporting(E_ALL & ~E_WARNING);
+$errorReporting = \error_reporting(\E_ALL & ~\E_WARNING);
 include_once $path . '/vendor/autoload.php';
-error_reporting($errorReporting);
+\error_reporting($errorReporting);
 unset($errorReporting, $path, $vendorPos);
-if (!class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
+if (!\class_exists(ClassLoader::class, \false)) {
     $mess = 'Could NOT find required Composer class auto loader. Aborting ...';
-    if ('cli' === PHP_SAPI) {
-        fwrite(STDERR, $mess);
+    if ('cli' === \PHP_SAPI) {
+        \fwrite(\STDERR, $mess);
     } else {
-        fwrite(STDOUT, $mess);
+        \fwrite(\STDOUT, $mess);
     }
     return 1;
 }

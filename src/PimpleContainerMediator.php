@@ -52,7 +52,7 @@ class PimpleContainerMediator extends AbstractContainerMediator
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Container $serviceContainer = null)
+    public function __construct(Container $serviceContainer = \null)
     {
         $this->setServiceContainer($serviceContainer);
     }
@@ -88,15 +88,15 @@ class PimpleContainerMediator extends AbstractContainerMediator
      *
      * @link http://pimple.sensiolabs.org/ Pimple
      */
-    public function setServiceContainer($value = null): ContainerMediatorInterface
+    public function setServiceContainer($value = \null): ContainerMediatorInterface
     {
-        if (null === $value) {
+        if (\null === $value) {
             $value = new Container();
         }
         if (!$value instanceof Container) {
-            $mess = sprintf(
+            $mess = \sprintf(
                 'Must be an instance of Pimple Container but given %s',
-                gettype($value)
+                \gettype($value)
             );
             throw new \InvalidArgumentException($mess);
         }

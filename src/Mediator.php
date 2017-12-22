@@ -56,9 +56,9 @@ class Mediator implements MediatorInterface
     {
         $this->checkEventName($eventName);
         $priority = $this->getActualPriority($eventName, $priority);
-        if (!(array_key_exists($eventName, $this->listeners)
-            && array_key_exists($priority, $this->listeners[$eventName])
-            && in_array($listener, $this->listeners[$eventName][$priority], true))
+        if (!(\array_key_exists($eventName, $this->listeners)
+            && \array_key_exists($priority, $this->listeners[$eventName])
+            && \in_array($listener, $this->listeners[$eventName][$priority], \true))
         ) {
             $this->listeners[$eventName][$priority][] = $listener;
         }
@@ -99,7 +99,7 @@ class Mediator implements MediatorInterface
     {
         $this->sortListeners($eventName);
         if ('' !== $eventName) {
-            return array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
+            return \array_key_exists($eventName, $this->listeners) ? $this->listeners[$eventName] : [];
         }
         return $this->listeners;
     }
@@ -125,7 +125,7 @@ class Mediator implements MediatorInterface
     public function removeListener(string $eventName, callable $listener, $priority = 0): MediatorInterface
     {
         $this->checkEventName($eventName);
-        if (!array_key_exists($eventName, $this->listeners)) {
+        if (!\array_key_exists($eventName, $this->listeners)) {
             return $this;
         }
         /**
@@ -136,16 +136,16 @@ class Mediator implements MediatorInterface
         if ('last' !== $priority) {
             $priorities = $this->listeners[$eventName];
         } else {
-            $priorities = array_reverse($this->listeners[$eventName], true);
+            $priorities = \array_reverse($this->listeners[$eventName], \true);
             $priority = 'first';
         }
-        $isIntPriority = is_int($priority);
+        $isIntPriority = \is_int($priority);
         foreach ($priorities as $atPriority => $listeners) {
             if ($isIntPriority && $priority !== $atPriority) {
                 continue;
             }
-            $key = array_search($listener, $listeners, true);
-            if (false !== $key) {
+            $key = \array_search($listener, $listeners, \true);
+            if (\false !== $key) {
                 $this->bubbleUpUnsetListener($eventName, $atPriority, $key);
                 if ('first' === $priority) {
                     break;
@@ -187,14 +187,14 @@ class Mediator implements MediatorInterface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function trigger(string $eventName, EventInterface $event = null): EventInterface
+    public function trigger(string $eventName, EventInterface $event = \null): EventInterface
     {
         $this->checkEventName($eventName);
-        if (null === $event) {
+        if (\null === $event) {
             $event = new Event();
         }
         $priorities = $this->getListeners($eventName);
-        if (0 !== count($priorities)) {
+        if (0 !== \count($priorities)) {
             /**
              * @var array    $listeners
              * @var callable $listener
@@ -223,7 +223,7 @@ class Mediator implements MediatorInterface
             $mess = 'Event name can NOT be empty';
             throw new \DomainException($mess);
         }
-        if (!ctype_print($eventName)) {
+        if (!\ctype_print($eventName)) {
             $mess = 'Using any non-printable characters in the event name is NOT allowed';
             throw new \DomainException($mess);
         }
@@ -237,10 +237,10 @@ class Mediator implements MediatorInterface
     protected function getActualPriority(string $eventName, $priority): int
     {
         if ($priority === 'first') {
-            $priority = !empty($this->listeners[$eventName]) ? max(array_keys($this->listeners[$eventName])) + 1 : 1;
+            $priority = !empty($this->listeners[$eventName]) ? \max(\array_keys($this->listeners[$eventName])) + 1 : 1;
             return (int)$priority;
         } elseif ($priority === 'last') {
-            $priority = !empty($this->listeners[$eventName]) ? min(array_keys($this->listeners[$eventName])) - 1 : -1;
+            $priority = !empty($this->listeners[$eventName]) ? \min(\array_keys($this->listeners[$eventName])) - 1 : -1;
             return (int)$priority;
         }
         return (int)$priority;
@@ -253,7 +253,7 @@ class Mediator implements MediatorInterface
      */
     protected function walkEventList(array $events, callable $callback)
     {
-        if (0 === count($events)) {
+        if (0 === \count($events)) {
             return;
         }
         /**
@@ -264,12 +264,12 @@ class Mediator implements MediatorInterface
          * @var array      $listener
          */
         foreach ($events as $eventName => $priorities) {
-            if (!is_array($priorities) || 0 === count($priorities)) {
+            if (!\is_array($priorities) || 0 === \count($priorities)) {
                 $mess = 'Must have as least one priority per listed event';
                 throw new \LengthException($mess);
             }
             foreach ($priorities as $priority => $listeners) {
-                if (!is_array($listeners) || 0 === count($listeners)) {
+                if (!\is_array($listeners) || 0 === \count($listeners)) {
                     $mess = 'Must have at least one listener per listed priority';
                     throw new \LengthException($mess);
                 }
@@ -287,10 +287,10 @@ class Mediator implements MediatorInterface
     private function bubbleUpUnsetListener(string $eventName, int $priority, int $key)
     {
         unset($this->listeners[$eventName][$priority][$key]);
-        if (0 === count($this->listeners[$eventName][$priority])) {
+        if (0 === \count($this->listeners[$eventName][$priority])) {
             unset($this->listeners[$eventName][$priority]);
         }
-        if (0 === count($this->listeners[$eventName])) {
+        if (0 === \count($this->listeners[$eventName])) {
             unset($this->listeners[$eventName]);
         }
     }
@@ -302,20 +302,20 @@ class Mediator implements MediatorInterface
      */
     private function sortListeners(string $eventName = ''): MediatorInterface
     {
-        if (0 === count($this->listeners)) {
+        if (0 === \count($this->listeners)) {
             return $this;
         }
         if ('' !== $eventName) {
-            if (!array_key_exists($eventName, $this->listeners)) {
+            if (!\array_key_exists($eventName, $this->listeners)) {
                 return $this;
             }
             $eventNames = [$eventName];
         } else {
-            ksort($this->listeners);
-            $eventNames = array_keys($this->listeners);
+            \ksort($this->listeners);
+            $eventNames = \array_keys($this->listeners);
         }
         foreach ($eventNames as $anEvent) {
-            krsort($this->listeners[$anEvent], SORT_NUMERIC);
+            \krsort($this->listeners[$anEvent], \SORT_NUMERIC);
         }
         return $this;
     }

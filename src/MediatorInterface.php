@@ -101,5 +101,5 @@ interface MediatorInterface
      *
      * @return EventInterface
      */
-    public function trigger(string $eventName, EventInterface $event = null): EventInterface;
+    public function trigger(string $eventName, EventInterface $event = \null): EventInterface;
 }

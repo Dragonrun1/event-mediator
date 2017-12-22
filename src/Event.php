@@ -50,7 +50,7 @@ class Event implements EventInterface
      */
     public function eventHandled(): EventInterface
     {
-        $this->handled = true;
+        $this->handled = \true;
         return $this;
     }
     /**
@@ -67,5 +67,5 @@ class Event implements EventInterface
      *
      * @var bool
      */
-    private $handled = false;
+    private $handled = \false;
 }

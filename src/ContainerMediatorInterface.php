@@ -122,5 +122,5 @@ interface ContainerMediatorInterface extends MediatorInterface
      *
      * @return ContainerMediatorInterface Fluent interface.
      */
-    public function setServiceContainer($value = null): ContainerMediatorInterface;
+    public function setServiceContainer($value = \null): ContainerMediatorInterface;
 }
