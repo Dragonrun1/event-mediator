@@ -278,7 +278,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         // Remove empty events.
         if (0 === \count($this->serviceListeners[$eventName])) {
             unset($this->serviceListeners[$eventName]);
-            $key = \array_search($eventName, $this->loadedServices, \true);
+            $key = (int)\array_search($eventName, $this->loadedServices, \true);
             unset($this->loadedServices[$key]);
         }
     }
@@ -315,7 +315,7 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
         throw new \InvalidArgumentException($mess);
     }
     /**
-     * @param array $eventNames
+     * @param string[] $eventNames
      *
      * @return ContainerMediatorInterface Fluent interface
      * @throws \DomainException
@@ -370,10 +370,18 @@ abstract class AbstractContainerMediator extends Mediator implements ContainerMe
     /**
      * List of already loaded services.
      *
-     * @var string[] $loadedServices
+     * @var array $loadedServices
      */
     private $loadedServices = [];
     /**
+     * Holds list of service listeners.
+     *
+     * {@internal Actual Generics-style notation would be:
+     *      array<string,array<int,array<int,array<string>>>>
+     *      or put another way:
+     *      $serviceListeners[string eventName][int priority][int]= ["containerID", "methodName"];
+     * }
+     *
      * @var array $serviceListeners Holds the list of service listeners that will be lazy loaded when events are
      * triggered.
      */

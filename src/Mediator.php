@@ -238,12 +238,13 @@ class Mediator implements MediatorInterface
     {
         if ($priority === 'first') {
             $priority = !empty($this->listeners[$eventName]) ? \max(\array_keys($this->listeners[$eventName])) + 1 : 1;
-            return (int)$priority;
-        } elseif ($priority === 'last') {
-            $priority = !empty($this->listeners[$eventName]) ? \min(\array_keys($this->listeners[$eventName])) - 1 : -1;
-            return (int)$priority;
+            return $priority;
         }
-        return (int)$priority;
+        if ($priority === 'last') {
+            $priority = !empty($this->listeners[$eventName]) ? \min(\array_keys($this->listeners[$eventName])) - 1 : -1;
+            return $priority;
+        }
+        return $priority;
     }
     /**
      * @param array    $events
